@@ -49,7 +49,7 @@ class Masscan:
         os.remove(self.output_json_path)
 
 
-def logrotate(files: [txt]):
+def logrotate(files: [str]):
     for file in files:
         with tarfile.open(f"{file}.tar.xz", 'x:xz') as tar_file:
             tar_file.add(file)
@@ -66,12 +66,11 @@ def main():
                               blacklist_file, "--open-only",
                               "--exclude", "255.255.255.255", "--capture", "html",
                               "--rate", "500000", "0.0.0.0/0"]
+    nmap_executable = "nmap"
 
     while(True):
         masscan = Masscan(masscan_executable,
                           masscan_scan_arguments, scan_file_binary, scan_file_json, scan_file_plain)
-        nmap = Nmapscan(nmap_executable, scan_file_plain,
-                        nmap_scan_arguments)
 
         masscan.start_scan()
         masscan.transform_output_file()
@@ -80,10 +79,11 @@ def main():
         date_time = datetime.today().strftime("%d-%m-%Y_%H-%M")
         nmap_normal_output_file = f"./open-proxy_{date_time}.txt"
         nmap_xml_output_file = f"./open-proxy_{date_time}.xml"
-        nmap_executable = "nmap"
         nmap_scan_arguments = ["-vvv", "-n", "-T4", "--script"
                                "http-open-proxy.nse", "-p", "3128", "--open",
                                "-Pn", "-sS", "-oN", nmap_normal_output_file, "-oX", nmap_xml_output_file]
+        nmap = Nmapscan(nmap_executable, scan_file_plain,
+                        nmap_scan_arguments)
         nmap.start_scan()
         nmap.destruct()
         logrotate([nmap_normal_output_file, nmap_xml_output_file])

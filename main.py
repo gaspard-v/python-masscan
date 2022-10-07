@@ -24,21 +24,21 @@ class Nmapscan:
 
 
 class Masscan:
-    def __init__(self, masscan_exec: str, scan_parameters: [str], transform_parameters: [str], output_json_path: str):
+    def __init__(self, masscan_exec: str, scan_parameters: [str], output_bin_path: str, output_json_path: str):
         self.masscan_exec = masscan_exec
         self.scan_parameters = scan_parameters
-        self.transform_parameters = transform_parameters
         self.output_json_path = output_json_path
+        self.output_bin_path = output_bin_path
 
     def start_scan(self):
-        return subprocess.call([self.masscan_exec, *self.scan_parameters])
+        return subprocess.call([self.masscan_exec, *self.scan_parameters, "-oB", self.output_bin_path])
 
     def get_output_file(self):
         subprocess.call(
-            [self.masscan_exec, *self.transform_parameters, self.output_json_path])
+            [self.masscan_exec, "--readscan",
+             self.output_bin_path, "-oJ", self.output_json_path])
         with open(self.output_json_path, 'r') as json_file:
-            json_plaintext = json_file.read()
-        return json.load(json_plaintext)
+            return json.load(json_file)
 
     def destruct():
         os.remove(output_json_path)
@@ -50,16 +50,15 @@ def main():
     scan_file_json = "./masscan-open-proxy.json"
     blacklist_file = "./ipblacklist.txt"
     masscan_scan_arguments = ["-p", "3128", "--excludefile",
-                              blacklist_file, "--open-only", "-oB", scan_file_binary,
+                              blacklist_file, "--open-only",
                               "--exclude", "255.255.255.255", "--capture", "html",
                               "--rate", "500000", "0.0.0.0/0"]
-    masscan_transform_arguments = ["-oJ"]
 
-    masscan = Masscan(masscan_executable, masscan_scan_arguments,
-                      masscan_transform_arguments, scan_file_json)
-    masscan.start_scan()
+    masscan = Masscan(masscan_executable,
+                      masscan_scan_arguments, scan_file_binary, scan_file_json)
+    # masscan.start_scan()
     masscan_output_object = masscan.get_output_file()
-    # masscan.destruct()
+    masscan.destruct()
 
     nmap_normal_output_file = "./open-proxy.txt"
     nmap_xml_output_file = "./open-proxy.xml"

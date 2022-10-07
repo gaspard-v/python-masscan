@@ -4,6 +4,8 @@
 import subprocess
 import json
 import os
+from datetime import datetime
+import tarfile
 
 
 class Nmapscan:
@@ -47,6 +49,13 @@ class Masscan:
         os.remove(self.output_json_path)
 
 
+def logrotate(files: [txt]):
+    for file in files:
+        with tarfile.open(f"{file}.tar.xz", 'x:xz') as tar_file:
+            tar_file.add(file)
+        os.remove(file)
+
+
 def main():
     masscan_executable = "masscan"
     scan_file_binary = "./masscan-open-proxy.bin"
@@ -58,22 +67,26 @@ def main():
                               "--exclude", "255.255.255.255", "--capture", "html",
                               "--rate", "500000", "0.0.0.0/0"]
 
-    masscan = Masscan(masscan_executable,
-                      masscan_scan_arguments, scan_file_binary, scan_file_json, scan_file_plain)
-    # masscan.start_scan()
-    masscan.transform_output_file()
-    masscan.destruct()
+    while(True):
+        masscan = Masscan(masscan_executable,
+                          masscan_scan_arguments, scan_file_binary, scan_file_json, scan_file_plain)
+        nmap = Nmapscan(nmap_executable, scan_file_plain,
+                        nmap_scan_arguments)
 
-    nmap_normal_output_file = "./open-proxy.txt"
-    nmap_xml_output_file = "./open-proxy.xml"
-    nmap_executable = "nmap"
-    nmap_scan_arguments = ["-vvv", "-n", "-T4", "--script"
-                           "http-open-proxy.nse", "-p", "3128", "--open",
-                           "-Pn", "-sS", "-oN", nmap_normal_output_file, "-oX", nmap_xml_output_file]
-    nmap = Nmapscan(nmap_executable, scan_file_plain,
-                    nmap_scan_arguments)
-    nmap.start_scan()
-    nmap.destruct()
+        masscan.start_scan()
+        masscan.transform_output_file()
+        masscan.destruct()
+
+        date_time = datetime.today().strftime("%d-%m-%Y_%H-%M")
+        nmap_normal_output_file = f"./open-proxy_{date_time}.txt"
+        nmap_xml_output_file = f"./open-proxy_{date_time}.xml"
+        nmap_executable = "nmap"
+        nmap_scan_arguments = ["-vvv", "-n", "-T4", "--script"
+                               "http-open-proxy.nse", "-p", "3128", "--open",
+                               "-Pn", "-sS", "-oN", nmap_normal_output_file, "-oX", nmap_xml_output_file]
+        nmap.start_scan()
+        nmap.destruct()
+        logrotate([nmap_normal_output_file, nmap_xml_output_file])
 
 
 if __name__ == '__main__':

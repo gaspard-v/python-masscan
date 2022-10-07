@@ -68,7 +68,7 @@ def main():
     nmap_xml_output_file = "./open-proxy.xml"
     nmap_executable = "nmap"
     nmap_scan_arguments = ["-vvv", "--script",
-                           "http-open-proxy.nse", "-p", "3128", "--open"
+                           "http-open-proxy.nse", "-p", "3128", "--open",
                            "-Pn", "-sS", "-oN", nmap_normal_output_file, "-oX", nmap_xml_output_file]
     nmap = Nmapscan(nmap_executable, scan_file_plain,
                     nmap_scan_arguments)

@@ -19,16 +19,15 @@ class Proxyscan:
 
     async def test_proxy(self, proxy: str, port: str):
         try:
-            async with aiohttp.ClientSession() as session:
+            async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(ssl=False)) as session:
                 async with session.get(self.test_url, proxy=f"http://{proxy}:{port}") as response:
                     text = await response.text() 
                     text = text.strip()
-                    print(text)
                     if proxy in text:
                         print(f"proxy {proxy}:{port} OK !")
                     
         except Exception as err:
-            print(err, file=sys.stderr)
+            pass
 
     async def test_proxies(self):
         tasks = []

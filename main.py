@@ -8,45 +8,43 @@ from datetime import datetime
 import tarfile
 import asyncio
 import sys
-import urllib3
-
+from typing import List
+import aiohttp
 
 class Proxyscan:
     def __init__(self, proxy_list_file: str):
         self.proxy_list_file = proxy_list_file
+        self.user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.0.0 Safari/537.36"
+        self.test_url = "https://myip.xosh.fr"
 
     async def test_proxy(self, proxy: str, port: str):
-        print(f"start {proxy}:{port}")
-        chrome_header = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.0.0 Safari/537.36"
-        url_test = "https://icanhazip.com"
-        expected_result = proxy
-        headers = urllib3.make_headers(
-            user_agent=chrome_header)
-        timeout = urllib3.util.Timeout(connect=10.0, read=10.0)
-        retry = urllib3.util.Retry(connect=2, read=2, redirect=5)
         try:
-            proxy_manager = urllib3.ProxyManager(
-                f"http://{proxy}:{port}", proxy_headers=headers, timeout=timeout, retries=retry, cert_reqs='CERT_NONE')
-            r = proxy_manager.request("GET", url_test)
-            if r == expected_result:
-                return True
+            async with aiohttp.ClientSession() as session:
+                async with session.get(self.test_url, proxy=f"http://{proxy}:{port}") as response:
+                    text = await response.text() 
+                    text = text.strip()
+                    print(text)
+                    if proxy in text:
+                        print(f"proxy {proxy}:{port} OK !")
+                    
         except Exception as err:
             print(err, file=sys.stderr)
-            pass
-        return False
 
     async def test_proxies(self):
         tasks = []
         with open(self.proxy_list_file, 'r') as proxy_file:
             for line in proxy_file:
                 [proxy, port] = line.split(":")
+                port = port.strip()
+                proxy = proxy.strip()
                 tasks.append(asyncio.create_task(self.test_proxy(proxy, port)))
 
-        await asyncio.gather(tasks)
+        await asyncio.gather(*tasks)
+        
 
 
 class Nmapscan:
-    def __init__(self, nmap_exec: str, masscan_output_path: str, scan_parameters: [str]):
+    def __init__(self, nmap_exec: str, masscan_output_path: str, scan_parameters: List[str]):
         self.nmap_exec = nmap_exec
         self.scan_parameters = scan_parameters
         self.masscan_output_path = masscan_output_path
@@ -60,7 +58,7 @@ class Nmapscan:
 
 
 class Masscan:
-    def __init__(self, masscan_exec: str, scan_parameters: [str], output_bin_path: str, output_json_path: str, output_plain_path: str):
+    def __init__(self, masscan_exec: str, scan_parameters: List[str], output_bin_path: str, output_json_path: str, output_plain_path: str):
         self.masscan_exec = masscan_exec
         self.scan_parameters = scan_parameters
         self.output_json_path = output_json_path
@@ -87,7 +85,7 @@ class Masscan:
         os.remove(self.output_bin_path)
 
 
-async def logrotate(files: [str]):
+async def logrotate(files: List[str]):
     for file in files:
         try:
             with tarfile.open(f"{file}.tar.xz", 'x:xz') as tar_file:

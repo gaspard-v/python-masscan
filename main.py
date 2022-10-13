@@ -6,6 +6,8 @@ import json
 import os
 from datetime import datetime
 import tarfile
+import asyncio
+import sys
 
 
 class Nmapscan:
@@ -14,11 +16,11 @@ class Nmapscan:
         self.scan_parameters = scan_parameters
         self.masscan_output_path = masscan_output_path
 
-    def start_scan(self):
+    async def start_scan(self):
         subprocess.call([self.nmap_exec, *self.scan_parameters,
                         "-iL", self.masscan_output_path])
 
-    def destruct(self):
+    async def destruct(self):
         os.remove(self.masscan_output_path)
 
 
@@ -30,10 +32,10 @@ class Masscan:
         self.output_bin_path = output_bin_path
         self.output_plain_path = output_plain_path
 
-    def start_scan(self):
+    async def start_scan(self):
         return subprocess.call([self.masscan_exec, *self.scan_parameters, "-oB", self.output_bin_path])
 
-    def transform_output_file(self):
+    async def transform_output_file(self):
         subprocess.call(
             [self.masscan_exec, "--readscan",
              self.output_bin_path, "-oJ", self.output_json_path])
@@ -45,18 +47,25 @@ class Masscan:
                     continue
                 plain_file.write(f"{data['ip']}\n")
 
-    def destruct(self):
+    async def destruct(self):
         os.remove(self.output_json_path)
+        os.remove(self.output_bin_path)
 
 
-def logrotate(files: [str]):
+async def logrotate(files: [str]):
     for file in files:
-        with tarfile.open(f"{file}.tar.xz", 'x:xz') as tar_file:
-            tar_file.add(file)
-        os.remove(file)
+        try:
+            with tarfile.open(f"{file}.tar.xz", 'x:xz') as tar_file:
+                tar_file.add(file)
+            os.remove(file)
+        except FileNotFoundError as err:
+            print(f"file {file} not found.\nError message: {err}",
+                  file=sys.stderr)
+        except Exception as err:
+            print(err, file=sys.stderr)
 
 
-def main():
+async def main():
     masscan_executable = "masscan"
     scan_file_binary = "./masscan-open-proxy.bin"
     scan_file_json = "./masscan-open-proxy.json"
@@ -72,22 +81,20 @@ def main():
         masscan = Masscan(masscan_executable,
                           masscan_scan_arguments, scan_file_binary, scan_file_json, scan_file_plain)
 
-        masscan.start_scan()
-        masscan.transform_output_file()
-        masscan.destruct()
+        await masscan.start_scan()
+        await masscan.transform_output_file()
 
-        date_time = datetime.today().strftime("%d-%m-%Y_%H-%M")
+        date_time = datetime.today().strftime("%d-%m-%Y_%H-%M-%S")
         nmap_normal_output_file = f"./open-proxy_{date_time}.txt"
         nmap_xml_output_file = f"./open-proxy_{date_time}.xml"
-        nmap_scan_arguments = ["-vvv", "-n", "-T4", "--script"
-                               "http-open-proxy.nse", "-p", "3128", "--open",
-                               "-Pn", "-sS", "-oN", nmap_normal_output_file, "-oX", nmap_xml_output_file]
+        nmap_scan_arguments = ["-vvv", "-n", "-T4", "--script", "http-open-proxy.nse", "-p", "3128",
+                               "--open", "-Pn", "-sS", "-oN", nmap_normal_output_file, "-oX", nmap_xml_output_file]
         nmap = Nmapscan(nmap_executable, scan_file_plain,
                         nmap_scan_arguments)
-        nmap.start_scan()
-        nmap.destruct()
-        logrotate([nmap_normal_output_file, nmap_xml_output_file])
+        await nmap.start_scan()
+        await asyncio.gather(masscan.destruct(), nmap.destruct(), logrotate(
+            [nmap_normal_output_file, nmap_xml_output_file]))
 
 
 if __name__ == '__main__':
-    main()
+    asyncio.run(main())

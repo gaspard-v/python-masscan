@@ -16,6 +16,7 @@ class Proxyscan:
         self.proxy_list_file = proxy_list_file
 
     async def test_proxy(self, proxy: str, port: str):
+        print(f"start {proxy}:{port}")
         chrome_header = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.0.0 Safari/537.36"
         url_test = "https://icanhazip.com"
         expected_result = proxy

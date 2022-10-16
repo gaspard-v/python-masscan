@@ -15,7 +15,8 @@ class masscan:
         self.output_json_file_path = output_json_file_path
         self.output_bin_file_path = output_bin_file_path
         self.output_plain_file_path = output_plain_file_path
-        self.scan_parameters = [*scan_parameters, "-oB", output_bin_file_path]
+        self.port = port
+        self.scan_parameters = [*scan_parameters, "-oB", output_bin_file_path, "-p", port]
     
     def __del__(self):
         asyncio.run(self.delete_temporary_files())

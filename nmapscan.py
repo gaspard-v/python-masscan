@@ -21,8 +21,7 @@ class nmapscan:
         self.output_open_proxy_file_path = output_open_proxy_file_path
 
     async def start_scan(self):
-        subprocess.call([self.nmap_exec, *self.scan_parameters,
-                        "-iL", self.input_plain_ip_file_path])
+        subprocess.call([self.nmap_exec, *self.scan_parameters])
 
     async def get_open_proxy(self):
         async def parseXml(data: str) -> Union[str, str, str, List[str]] | None:

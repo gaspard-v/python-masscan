@@ -5,20 +5,24 @@ from typing import List, Union
 import asyncio
 
 class nmapscan:
-    def __init__(self, nmap_exec: str, scan_parameters: List[str], input_plain_path: str, output_xml_path: str, output_plain_path: str, output_open_proxy: str):
+    def __init__(self, nmap_exec: str,  
+                    input_plain_ip_file_path: str = "./iplist.txt", 
+                    output_xml_file_path: str = "./nmap-scan.xml", 
+                    output_plain_file_path: str = "./nmap-scan.txt", 
+                    output_open_proxy_file_path: str = "./open-proxy.txt",
+                    port: int = 3128,
+                    scan_parameters: List[str] = []):
+
         self.nmap_exec = nmap_exec
-        self.scan_parameters = scan_parameters
-        self.input_plain_path = input_plain_path
-        self.output_xml_path = output_xml_path
-        self.output_plain_path = output_plain_path
-        self.output_open_proxy = output_open_proxy
-    
-    def __del__(self):
-        asyncio.run(self.delete_temporary_files())
+        self.scan_parameters = [*scan_parameters, "-iL", input_plain_ip_file_path, "-oN", output_plain_file_path, "-oX", output_xml_file_path, "-p", port]
+        self.input_plain_ip_file_path = input_plain_ip_file_path
+        self.output_xml_file_path = output_xml_file_path
+        self.output_plain_file_path = output_plain_file_path
+        self.output_open_proxy_file_path = output_open_proxy_file_path
 
     async def start_scan(self):
         subprocess.call([self.nmap_exec, *self.scan_parameters,
-                        "-iL", self.input_plain_path])
+                        "-iL", self.input_plain_ip_file_path])
 
     async def get_open_proxy(self):
         async def parseXml(data: str) -> Union[str, str, str, List[str]] | None:
@@ -45,7 +49,7 @@ class nmapscan:
 
         data = ""
         record = False
-        with open(self.output_xml_path) as file:
+        with open(self.output_xml_file_path) as file:
             for line in file:
                 if "<host" in line:
                     record = True
@@ -54,12 +58,12 @@ class nmapscan:
                 if "</host>" in line:
                     record = False
                     result = await parseXml(data)
-                    if result != "":
+                    if result:
                         print(result)
                     data = ""
 
     async def delete_temporary_files(self):
         try:
-            os.remove(self.input_plain_path)
+            os.remove(self.input_plain_ip_file_path)
         except Exception as err:
             pass

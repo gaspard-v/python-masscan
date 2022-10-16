@@ -48,7 +48,7 @@ class nmapscan:
 
         data = ""
         record = False
-        with open(self.output_xml_file_path) as file:
+        with open(self.output_xml_file_path, 'r') as file:
             for line in file:
                 if "<host" in line:
                     record = True

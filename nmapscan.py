@@ -4,17 +4,19 @@ import os
 from typing import List, Union
 import asyncio
 
+
 class nmapscan:
-    def __init__(self, nmap_exec: str,  
-                    input_plain_ip_file_path: str = "./iplist.txt", 
-                    output_xml_file_path: str = "./nmap-scan.xml", 
-                    output_plain_file_path: str = "./nmap-scan.txt", 
-                    output_open_proxy_file_path: str = "./open-proxy.txt",
-                    port: int = 3128,
-                    scan_parameters: List[str] = []):
+    def __init__(self, nmap_exec: str,
+                 input_plain_ip_file_path: str = "./iplist.txt",
+                 output_xml_file_path: str = "./nmap-scan.xml",
+                 output_plain_file_path: str = "./nmap-scan.txt",
+                 output_open_proxy_file_path: str = "./open-proxy.txt",
+                 port: int = 3128,
+                 *scan_parameters):
 
         self.nmap_exec = nmap_exec
-        self.scan_parameters = [*scan_parameters, "-iL", input_plain_ip_file_path, "-oN", output_plain_file_path, "-oX", output_xml_file_path, "-p", port]
+        self.scan_parameters = [*scan_parameters, "-iL", input_plain_ip_file_path,
+                                "-oN", output_plain_file_path, "-oX", output_xml_file_path, "-p", port]
         self.input_plain_ip_file_path = input_plain_ip_file_path
         self.output_xml_file_path = output_xml_file_path
         self.output_plain_file_path = output_plain_file_path

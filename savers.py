@@ -27,6 +27,12 @@ class save_mariadb:
         self.database = database
         self.kwargs = kwargs
 
+    def __del__(self):
+        try:
+            asyncio.run(self.__disconnect())
+        except Exception as err:
+            pass
+
     async def __connect(self):
         self.conn = mariadb.connect(
             user=self.user,
@@ -38,6 +44,7 @@ class save_mariadb:
 
     async def __disconnect(self):
         try:
+            self.conn.commit()
             self.conn.close()
         except Exception as err:
             pass

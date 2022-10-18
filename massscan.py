@@ -4,19 +4,21 @@ import os
 from typing import List
 import json
 
+
 class masscan:
-    def __init__(self, masscan_exec: str, 
-                    output_bin_file_path: str = "./masscan-scan-file.bin", 
-                    output_json_file_path: str = "./masscan-scan-file.json", 
-                    output_plain_file_path: str = "./masscan-scan-file.txt",
-                    port: int = 3128,
-                    scan_parameters: List[str] = []):
+    def __init__(self, masscan_exec: str,
+                 output_bin_file_path: str = "./masscan-scan-file.bin",
+                 output_json_file_path: str = "./masscan-scan-file.json",
+                 output_plain_file_path: str = "./masscan-scan-file.txt",
+                 port: int = 3128,
+                 *scan_parameters):
         self.masscan_exec = masscan_exec
         self.output_json_file_path = output_json_file_path
         self.output_bin_file_path = output_bin_file_path
         self.output_plain_file_path = output_plain_file_path
         self.port = port
-        self.scan_parameters = [*scan_parameters, "-oB", output_bin_file_path, "-p", port]
+        self.scan_parameters = [*scan_parameters,
+                                "-oB", output_bin_file_path, "-p", port]
 
     async def start_scan(self):
         return subprocess.call([self.masscan_exec, *self.scan_parameters])

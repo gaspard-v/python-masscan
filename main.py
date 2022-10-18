@@ -5,6 +5,7 @@ from datetime import datetime
 import asyncio
 from nmapscan import nmapscan
 from savers import save_mariadb
+from data_saver import data_saver
 
 
 async def main():
@@ -42,7 +43,10 @@ async def main():
     # await asyncio.gather(masscan_destruct, nmap_destruct, logrotate_task)
     db = save_mariadb("openproxy", "parN4Tm#wDzGoPo$wJ%b7DU",
                       "10.66.66.1", "openproxy", autocommit=True)
-    await db.save_mariadb({"address": "5.5.5.5", "ip_type": 4})
+    savers = data_saver(special_callbacks=[db.save_mariadb])
+    oof = await savers.special_save(
+        {"address": "5.5.5.5", "ip_type": 4})
+    await asyncio.gather(*oof)
 
 if __name__ == '__main__':
     asyncio.run(main())

@@ -1,7 +1,7 @@
 from typing import List, Callable, Awaitable
 
-GENERAL_CALLBACK = Callable[[str, str], Awaitable[int]]
-SPECIAL_CALLBACK = Callable[[dict], Awaitable[int]]
+GENERAL_CALLBACK = Callable[[str, str], List[Awaitable[int]]]
+SPECIAL_CALLBACK = Callable[[dict], List[Awaitable[int]]]
 
 
 class data_saver:
@@ -9,16 +9,14 @@ class data_saver:
         self.general_callbacks = general_callbacks
         self.special_callbacks = special_callbacks
 
-    def add_general_callbacks(self, general_callbacks: List[GENERAL_CALLBACK]):
+    async def add_general_callbacks(self, general_callbacks: List[GENERAL_CALLBACK]):
         self.general_callbacks += general_callbacks
 
-    def add_special_callbacks(self, special_callbacks: List[SPECIAL_CALLBACK]):
+    async def add_special_callbacks(self, special_callbacks: List[SPECIAL_CALLBACK]):
         self.special_callbacks += special_callbacks
 
-    def general_save(self, data: str, filename: str):
-        for callback in self.general_callbacks:
-            callback(data, filename)
+    async def general_save(self, data: str, filename: str):
+        return [callback(data, filename) for callback in self.general_callbacks]
 
-    def special_save(self, data: dict, filename: str):
-        for callback in self.special_callbacks:
-            callback(data, filename)
+    async def special_save(self, data: dict):
+        return [callback(data) for callback in self.special_callbacks]

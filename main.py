@@ -41,7 +41,7 @@ async def main():
 
     # await asyncio.gather(masscan_destruct, nmap_destruct, logrotate_task)
     db = save_mariadb("openproxy", "parN4Tm#wDzGoPo$wJ%b7DU",
-                      "10.66.66.1", "openproxy")
+                      "10.66.66.1", "openproxy", autocommit=True)
     await db.save_mariadb({"address": "5.5.5.5", "ip_type": 4})
 
 if __name__ == '__main__':

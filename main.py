@@ -4,6 +4,8 @@
 from datetime import datetime
 import asyncio
 from nmapscan import nmapscan
+from savers import save_mariadb
+
 
 async def main():
     # masscan_executable = "masscan"
@@ -38,9 +40,9 @@ async def main():
     #         [nmap_normal_output_file, nmap_xml_output_file]))
 
     # await asyncio.gather(masscan_destruct, nmap_destruct, logrotate_task)
-    nmap = nmapscan("nmap_exec", [], "input_plain_path",
-                    "./open-proxy_13-10-2022_18-21-39.xml", "output_plain_path", "output_open_proxy")
-    await nmap.get_open_proxy()
+    db = save_mariadb("openproxy", "parN4Tm#wDzGoPo$wJ%b7DU",
+                      "10.66.66.1", "openproxy")
+    await db.save_mariadb({"address": "5.5.5.5", "ip_type": 4})
 
 if __name__ == '__main__':
     asyncio.run(main())

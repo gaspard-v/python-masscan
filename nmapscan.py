@@ -3,10 +3,12 @@ import xml.dom.minidom as xml
 import os
 from typing import List, Union
 import asyncio
+from data_saver import data_saver
 
 
 class nmapscan:
     def __init__(self, nmap_exec: str,
+                 save: data_saver,
                  input_plain_ip_file_path: str = "./iplist.txt",
                  output_xml_file_path: str = "./nmap-scan.xml",
                  output_plain_file_path: str = "./nmap-scan.txt",
@@ -21,6 +23,7 @@ class nmapscan:
         self.output_xml_file_path = output_xml_file_path
         self.output_plain_file_path = output_plain_file_path
         self.output_open_proxy_file_path = output_open_proxy_file_path
+        self.save = save
 
     async def start_scan(self):
         subprocess.call([self.nmap_exec, *self.scan_parameters])
@@ -59,8 +62,22 @@ class nmapscan:
                 if "</host>" in line:
                     record = False
                     result = await parseXml(data)
-                    if result:
-                        print(result)
+                    if not result:
+                        continue
+                    (adresse, port, adresse_type, methodes) = result
+                    ip_type = 4 if "ipv4" in adresse_type else 6
+                    data = {
+                        "address": adresse,
+                        "ip_type": ip_type,
+                        "methodes": methodes
+                    }
+                    save_function = await self.save.special_save(
+                        data, self.output_open_proxy_file_path)
+                    save_function += await self.save.general_save(
+                        str(data), self.output_open_proxy_file_path)
+                    tasks = [asyncio.create_task(function())
+                             for function in save_function]
+
                     data = ""
 
     async def delete_temporary_files(self):

@@ -19,6 +19,7 @@ class save_mariadb:
     class database_type:
         address: str
         ip_type: int
+        methodes: List[str]
 
     def __init__(self, user: str, password: str, host: str, database: str, **kwargs):
         self.user = user
@@ -49,12 +50,15 @@ class save_mariadb:
         except Exception as err:
             pass
 
-    async def __save_mariadb(self, data: database_type):
+    async def __save_mariadb(self, data: database_type, filename: str):
         await self.__connect()
         address = data["address"]
         ip_type = data["ip_type"]
+        methodes = data["methodes"]
+        methodes_str = " ".join(methodes)
         cur = self.conn.cursor(prepared=True)
-        result = cur.callproc('add_proxy', (address, ip_type))
+        cur.callproc(
+            'add_proxy', (address, ip_type, methodes_str, filename))
         self.conn.commit()
         await self.__disconnect()
 

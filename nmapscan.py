@@ -53,6 +53,7 @@ class nmapscan:
 
         data = ""
         record = False
+        tasks = []
         with open(self.output_xml_file_path, 'r') as file:
             for line in file:
                 if "<host" in line:
@@ -75,10 +76,12 @@ class nmapscan:
                         data, self.output_open_proxy_file_path)
                     save_function += await self.save.general_save(
                         str(data), self.output_open_proxy_file_path)
-                    tasks = [asyncio.create_task(function())
-                             for function in save_function]
+                    tasks += [asyncio.create_task(function())
+                              for function in save_function]
 
                     data = ""
+        if len(tasks) != 0:
+            asyncio.gather(*tasks)
 
     async def delete_temporary_files(self):
         try:

@@ -45,8 +45,10 @@ async def main():
                       "10.66.66.1", "openproxy", autocommit=True)
     savers = data_saver(special_callbacks=[db.save_mariadb])
     oof = await savers.special_save(
-        {"address": "5.5.5.5", "ip_type": 4})
+        {"address": "5.5.5.5", "ip_type": 4, "methodes": ["GET"]}, "ip.txt")
     await asyncio.gather(*oof)
 
 if __name__ == '__main__':
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
     asyncio.run(main())

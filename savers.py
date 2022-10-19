@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from data_saver import GENERAL_CALLBACK, SPECIAL_CALLBACK
-
+from typing import List
 import mariadb
 
 

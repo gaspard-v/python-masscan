@@ -14,7 +14,7 @@ class nmapscan:
                  output_plain_file_path: str = "./nmap-scan.txt",
                  output_open_proxy_file_path: str = "./open-proxy.txt",
                  port: int = 3128,
-                 *scan_parameters):
+                 scan_parameters=[]):
 
         self.nmap_exec = nmap_exec
         self.scan_parameters = [*scan_parameters, "-iL", input_plain_ip_file_path,

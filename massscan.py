@@ -11,7 +11,7 @@ class masscan:
                  output_json_file_path: str = "./masscan-scan-file.json",
                  output_plain_file_path: str = "./masscan-scan-file.txt",
                  port: int = 3128,
-                 *scan_parameters):
+                 scan_parameters=[]):
         self.masscan_exec = masscan_exec
         self.output_json_file_path = output_json_file_path
         self.output_bin_file_path = output_bin_file_path

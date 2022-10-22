@@ -67,7 +67,7 @@ async def main():
 
         await nmap.start_scan()
         task = asyncio.create_task(nmap.get_open_proxy())
-        task.add_done_callback(nmap.delete_temporary_files())
+        task = add_success_callback(task, nmap.delete_temporary_files())
         tasks.append(task)
         tasks.append(asyncio.create_task(logrotate([open_proxy_file])))
 

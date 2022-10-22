@@ -18,7 +18,7 @@ class Masscan:
         self.output_plain_file_path = output_plain_file_path
         self.port = port
         self.scan_parameters = [*scan_parameters,
-                                "-oB", output_bin_file_path, "-p", port]
+                                "-oB", output_bin_file_path, "-p", str(port)]
 
     async def start_scan(self):
         return subprocess.call([self.masscan_exec, *self.scan_parameters])

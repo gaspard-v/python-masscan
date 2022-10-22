@@ -14,3 +14,8 @@ async def logrotate(files: List[str]):
                   file=sys.stderr)
         except Exception as err:
             print(err, file=sys.stderr)
+    
+async def add_success_callback(fut, callback):
+    result = await fut
+    await callback()
+    return result

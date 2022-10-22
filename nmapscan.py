@@ -18,7 +18,7 @@ class Nmapscan:
 
         self.nmap_exec = nmap_exec
         self.scan_parameters = [*scan_parameters, "-iL", input_plain_ip_file_path,
-                                "-oN", output_plain_file_path, "-oX", output_xml_file_path, "-p", port]
+                                "-oN", output_plain_file_path, "-oX", output_xml_file_path, "-p", str(port)]
         self.input_plain_ip_file_path = input_plain_ip_file_path
         self.output_xml_file_path = output_xml_file_path
         self.output_plain_file_path = output_plain_file_path
@@ -86,5 +86,7 @@ class Nmapscan:
     async def delete_temporary_files(self):
         try:
             os.remove(self.input_plain_ip_file_path)
+            os.remove(self.output_xml_file_path)
+            os.remove(self.output_plain_file_path)
         except Exception as err:
             pass

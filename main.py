@@ -6,8 +6,8 @@
 
 from datetime import datetime
 import asyncio
-from nmapscan import nmapscan
-from massscan import masscan
+from nmapscan import Nmapscan
+from massscan import Masscan
 import savers
 from data_saver import data_saver
 
@@ -25,7 +25,7 @@ async def main():
                               "--rate", "500000", "0.0.0.0/0"]
     nmap_executable = "nmap"
 
-    masscan = masscan(masscan_executable, scan_file_binary,
+    masscan = Masscan(masscan_executable, scan_file_binary,
                       scan_file_json, scan_file_plain, port, masscan_scan_arguments)
     db = savers.save_mariadb("openproxy", "parN4Tm#wDzGoPo$wJ%b7DU",
                              "home.xosh.fr", "openproxy", autocommit=True)
@@ -33,28 +33,26 @@ async def main():
         [savers.save_file, savers.save_print], [db.save_mariadb])
 
     while True:
-        try:
-            await masscan.start_scan()
-            await masscan.transform_output_file()
-            masscan_destruct = asyncio.create_task(
-                masscan.delete_temporary_files())
+        await masscan.start_scan()
+        await masscan.transform_output_file()
+        masscan_destruct = asyncio.create_task(
+            masscan.delete_temporary_files())
 
-            date_time = datetime.today().strftime("%d-%m-%Y_%H-%M-%S")
-            nmap_normal_output_file = f"./nmap_scan_{date_time}.txt"
-            nmap_xml_output_file = f"./nmap_scan_{date_time}.xml"
-            open_proxy_file = f"./open_proxy_{date_time}.txt"
-            nmap_scan_arguments = ["-vvv", "-n", "-T4", "--script", "http-open-proxy.nse",
-                                   "--open", "-Pn", "-sS"]
-            nmap = nmapscan(nmap_executable, savers, scan_file_plain,
-                            nmap_xml_output_file, nmap_normal_output_file, open_proxy_file, port, nmap_scan_arguments)
-            await nmap.start_scan()
-            nmap_get_proxy = asyncio.create_task(nmap.get_open_proxy())
-            nmap_destruct = asyncio.create_task(nmap.delete_temporary_files())
-            logrotate_task = asyncio.create_task(logrotate(
-                [nmap_normal_output_file, nmap_xml_output_file]))
-            await asyncio.gather(masscan_destruct, nmap_destruct, nmap_get_proxy, logrotate_task)
-        except Exception as err:
-            print(err)
+        date_time = datetime.today().strftime("%d-%m-%Y_%H-%M-%S")
+        nmap_normal_output_file = f"./nmap_scan_{date_time}.txt"
+        nmap_xml_output_file = f"./nmap_scan_{date_time}.xml"
+        open_proxy_file = f"./open_proxy_{date_time}.txt"
+        nmap_scan_arguments = ["-vvv", "-n", "-T4", "--script", "http-open-proxy.nse",
+                                "--open", "-Pn", "-sS"]
+        nmap = Nmapscan(nmap_executable, savers, scan_file_plain,
+                        nmap_xml_output_file, nmap_normal_output_file, open_proxy_file, port, nmap_scan_arguments)
+        await nmap.start_scan()
+        nmap_get_proxy = asyncio.create_task(nmap.get_open_proxy())
+        nmap_destruct = asyncio.create_task(nmap.delete_temporary_files())
+        logrotate_task = asyncio.create_task(logrotate(
+            [nmap_normal_output_file, nmap_xml_output_file]))
+        await asyncio.gather(masscan_destruct, nmap_destruct, nmap_get_proxy, logrotate_task)
+
 if __name__ == '__main__':
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)

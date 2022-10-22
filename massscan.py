@@ -5,7 +5,7 @@ from typing import List
 import json
 
 
-class masscan:
+class Masscan:
     def __init__(self, masscan_exec: str,
                  output_bin_file_path: str = "./masscan-scan-file.bin",
                  output_json_file_path: str = "./masscan-scan-file.json",

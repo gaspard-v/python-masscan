@@ -6,7 +6,7 @@ import asyncio
 from data_saver import data_saver
 
 
-class nmapscan:
+class Nmapscan:
     def __init__(self, nmap_exec: str,
                  save: data_saver,
                  input_plain_ip_file_path: str = "./iplist.txt",

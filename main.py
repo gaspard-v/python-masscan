@@ -29,7 +29,7 @@ async def main():
                       scan_file_json, scan_file_plain, port, masscan_scan_arguments)
     db = savers.save_mariadb("openproxy", "parN4Tm#wDzGoPo$wJ%b7DU",
                              "home.xosh.fr", "openproxy", autocommit=True)
-    savers = data_saver(
+    savers_obj = data_saver(
         [savers.save_file, savers.save_print], [db.save_mariadb])
 
     while True:
@@ -44,7 +44,7 @@ async def main():
         open_proxy_file = f"./open_proxy_{date_time}.txt"
         nmap_scan_arguments = ["-vvv", "-n", "-T4", "--script", "http-open-proxy.nse",
                                 "--open", "-Pn", "-sS"]
-        nmap = Nmapscan(nmap_executable, savers, scan_file_plain,
+        nmap = Nmapscan(nmap_executable, savers_obj, scan_file_plain,
                         nmap_xml_output_file, nmap_normal_output_file, open_proxy_file, port, nmap_scan_arguments)
         await nmap.start_scan()
         nmap_get_proxy = asyncio.create_task(nmap.get_open_proxy())

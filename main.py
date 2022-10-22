@@ -66,10 +66,10 @@ async def main():
                         open_proxy_file, port, nmap_scan_arguments)
 
         await nmap.start_scan()
-        task = asyncio.ensure_future(nmap.get_open_proxy())
-        task = asyncio.ensure_future(add_success_callback(task, nmap.delete_temporary_files()))
-        task = asyncio.create_task(add_success_callback(task, logrotate([open_proxy_file])))
+        task = asyncio.create_task(nmap.get_open_proxy())
+        task.add_done_callback(nmap.delete_temporary_files())
         tasks.append(task)
+        tasks.append(asyncio.create_task(logrotate([open_proxy_file])))
 
     print("finishing all tasks ...")
     await asyncio.gather(*tasks)

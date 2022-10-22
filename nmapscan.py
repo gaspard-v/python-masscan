@@ -1,7 +1,7 @@
 import subprocess
 import xml.dom.minidom as xml
 import os
-from typing import List, Union
+from typing import List, Union, Optional
 import asyncio
 from data_saver import data_saver
 
@@ -29,7 +29,7 @@ class Nmapscan:
         subprocess.call([self.nmap_exec, *self.scan_parameters])
 
     async def get_open_proxy(self):
-        async def parseXml(data: str) -> Union[str, str, str, List[str]] | None:
+        async def parseXml(data: str) -> Optional[Union[str, str, str, List[str]]]:
             try:
                 dom = xml.parseString(data)
                 [adresse_element] = dom.getElementsByTagName("address")

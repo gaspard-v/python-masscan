@@ -27,7 +27,7 @@ class Masscan:
         subprocess.call(
             [self.masscan_exec, "--readscan",
              self.output_bin_file_path, "-oJ", self.output_json_file_path])
-        with open(self.output_json_file_path, 'r') as json_file, open(self.output_json_file_path, 'a') as plain_file:
+        with open(self.output_json_file_path, 'r') as json_file, open(self.output_json_file_path, 'w+') as plain_file:
             for line in json_file:
                 try:
                     data = json.loads(line)

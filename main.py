@@ -25,19 +25,19 @@ async def main():
                               "--rate", "500000", "0.0.0.0/0"]
     nmap_executable = "nmap"
 
-    masscan = masscan(masscan_executable, scan_file_binary,
-                      scan_file_json, scan_file_plain, port, masscan_scan_arguments)
+    masscan_obj = masscan(masscan_executable, scan_file_binary,
+                          scan_file_json, scan_file_plain, port, masscan_scan_arguments)
     db = savers.save_mariadb("openproxy", "parN4Tm#wDzGoPo$wJ%b7DU",
                              "home.xosh.fr", "openproxy", autocommit=True)
-    savers = data_saver(
+    savers_obj = data_saver(
         [savers.save_file, savers.save_print], [db.save_mariadb])
 
     while True:
         try:
-            await masscan.start_scan()
-            await masscan.transform_output_file()
+            await masscan_obj.start_scan()
+            await masscan_obj.transform_output_file()
             masscan_destruct = asyncio.create_task(
-                masscan.delete_temporary_files())
+                masscan_obj.delete_temporary_files())
 
             date_time = datetime.today().strftime("%d-%m-%Y_%H-%M-%S")
             nmap_normal_output_file = f"./nmap_scan_{date_time}.txt"
@@ -45,7 +45,7 @@ async def main():
             open_proxy_file = f"./open_proxy_{date_time}.txt"
             nmap_scan_arguments = ["-vvv", "-n", "-T4", "--script", "http-open-proxy.nse",
                                    "--open", "-Pn", "-sS"]
-            nmap = nmapscan(nmap_executable, savers, scan_file_plain,
+            nmap = nmapscan(nmap_executable, savers_obj, scan_file_plain,
                             nmap_xml_output_file, nmap_normal_output_file, open_proxy_file, port, nmap_scan_arguments)
             await nmap.start_scan()
             nmap_get_proxy = asyncio.create_task(nmap.get_open_proxy())

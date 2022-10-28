@@ -31,6 +31,8 @@ signal.signal(signal.SIGINT, sigint_handler)
 
 async def main():
     global SIGINT_RECEIVED
+    logging.config.fileConfig('logging.ini')
+    logger = logging.getLogger(__name__)
     masscan_executable = "masscan"
     scan_file_binary = "./masscan-open-proxy.bin"
     scan_file_json = "./masscan-open-proxy.json"
@@ -76,7 +78,7 @@ async def main():
             tasks.append(task)
             tasks.append(asyncio.create_task(logrotate([open_proxy_file])))
         except Exception as err:
-            print(err)
+            logger.exception(err)
 
     print("finishing all tasks ...")
     await asyncio.gather(*tasks)

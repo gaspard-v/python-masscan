@@ -3,14 +3,21 @@ from data_saver import GENERAL_CALLBACK, SPECIAL_CALLBACK
 from typing import List
 import mariadb
 import asyncio
+import logging
+
+__logger = logging.getLogger(__file__)
+
 
 async def __save_print(data: str, filename: str):
     print(f"{filename}: \"{ascii(data)}\"")
 
 
 async def __save_file(data: str, filename: str):
-    with open(filename, "a+") as file:
-        file.write(data)
+    try:
+        with open(filename, "a+") as file:
+            file.write(data)
+    except Exception as err:
+        __logger.warning(err)
 
 
 class save_mariadb:
@@ -42,7 +49,7 @@ class save_mariadb:
             self.conn.commit()
             self.conn.close()
         except Exception as err:
-            pass
+            __logger.warning(err)
 
     async def __save_mariadb(self, data: database_type, filename: str):
         await self.__connect()

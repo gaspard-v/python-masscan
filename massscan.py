@@ -3,6 +3,7 @@ import subprocess
 import os
 from typing import List
 import json
+import logging
 
 
 class Masscan:
@@ -19,6 +20,7 @@ class Masscan:
         self.port = port
         self.scan_parameters = [*scan_parameters,
                                 "-oB", output_bin_file_path, "-p", str(port)]
+        self.logger = logging.getLogger(__file__)
 
     async def start_scan(self):
         return subprocess.call([self.masscan_exec, *self.scan_parameters])
@@ -32,6 +34,7 @@ class Masscan:
                 try:
                     data = json.loads(line)
                 except Exception as err:
+                    self.logger.debug(err)
                     continue
                 plain_file.write(f"{data['ip']}\n")
 
@@ -40,4 +43,4 @@ class Masscan:
             os.remove(self.output_json_file_path)
             os.remove(self.output_bin_file_path)
         except Exception as err:
-            pass
+            self.logger.warning(err)

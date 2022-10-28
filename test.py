@@ -1,4 +1,7 @@
-import logging, logging.handlers, logging.config
+import logging
+import logging.handlers
+import logging.config
+import os
 
 logging.config.fileConfig('logging.ini')
 
@@ -12,7 +15,7 @@ logger.warning('warn message')
 logger.error('error message')
 logger.critical('critical message')
 try:
-    raise Exception("OOOF")
+    os.remove("ifhjifuejfuiehfueheu_ihfej")
 except Exception as err:
-    logger.exception(err)
+    logger.warning(err)
 print("OK")

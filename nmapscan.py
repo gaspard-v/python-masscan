@@ -4,6 +4,7 @@ import os
 from typing import List, Union, Optional
 import asyncio
 from data_saver import data_saver
+import logging
 
 
 class Nmapscan:
@@ -24,6 +25,7 @@ class Nmapscan:
         self.output_plain_file_path = output_plain_file_path
         self.output_open_proxy_file_path = output_open_proxy_file_path
         self.save = save
+        self.logger = logging.getLogger(__file__)
 
     async def start_scan(self):
         subprocess.call([self.nmap_exec, *self.scan_parameters])
@@ -48,7 +50,7 @@ class Nmapscan:
                     methodes = methode.split(" ")
                     return (adresse, port, adresse_type, methodes)
             except Exception as err:
-                pass
+                self.logger.debug(err)
             return None
 
         data = ""
@@ -89,4 +91,4 @@ class Nmapscan:
             os.remove(self.output_xml_file_path)
             os.remove(self.output_plain_file_path)
         except Exception as err:
-            pass
+            self.logger.warning(err)

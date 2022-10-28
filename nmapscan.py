@@ -1,12 +1,12 @@
 import subprocess
 import xml.dom.minidom as xml
 import os
-from typing import List, Union
+from typing import List, Union, Optional
 import asyncio
 from data_saver import data_saver
 
 
-class nmapscan:
+class Nmapscan:
     def __init__(self, nmap_exec: str,
                  save: data_saver,
                  input_plain_ip_file_path: str = "./iplist.txt",
@@ -18,7 +18,7 @@ class nmapscan:
 
         self.nmap_exec = nmap_exec
         self.scan_parameters = [*scan_parameters, "-iL", input_plain_ip_file_path,
-                                "-oN", output_plain_file_path, "-oX", output_xml_file_path, "-p", port]
+                                "-oN", output_plain_file_path, "-oX", output_xml_file_path, "-p", str(port)]
         self.input_plain_ip_file_path = input_plain_ip_file_path
         self.output_xml_file_path = output_xml_file_path
         self.output_plain_file_path = output_plain_file_path
@@ -29,7 +29,7 @@ class nmapscan:
         subprocess.call([self.nmap_exec, *self.scan_parameters])
 
     async def get_open_proxy(self):
-        async def parseXml(data: str) -> Union[str, str, str, List[str]] | None:
+        async def parseXml(data: str) -> Optional[Union[str, str, str, List[str]]]:
             try:
                 dom = xml.parseString(data)
                 [adresse_element] = dom.getElementsByTagName("address")
@@ -86,5 +86,7 @@ class nmapscan:
     async def delete_temporary_files(self):
         try:
             os.remove(self.input_plain_ip_file_path)
+            os.remove(self.output_xml_file_path)
+            os.remove(self.output_plain_file_path)
         except Exception as err:
             pass

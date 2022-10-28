@@ -5,7 +5,7 @@ from typing import List
 import json
 
 
-class masscan:
+class Masscan:
     def __init__(self, masscan_exec: str,
                  output_bin_file_path: str = "./masscan-scan-file.bin",
                  output_json_file_path: str = "./masscan-scan-file.json",
@@ -18,7 +18,7 @@ class masscan:
         self.output_plain_file_path = output_plain_file_path
         self.port = port
         self.scan_parameters = [*scan_parameters,
-                                "-oB", output_bin_file_path, "-p", port]
+                                "-oB", output_bin_file_path, "-p", str(port)]
 
     async def start_scan(self):
         return subprocess.call([self.masscan_exec, *self.scan_parameters])
@@ -27,7 +27,7 @@ class masscan:
         subprocess.call(
             [self.masscan_exec, "--readscan",
              self.output_bin_file_path, "-oJ", self.output_json_file_path])
-        with open(self.output_json_file_path, 'r') as json_file, open(self.output_json_file_path, 'a') as plain_file:
+        with open(self.output_json_file_path, 'r') as json_file, open(self.output_plain_file_path, 'w+') as plain_file:
             for line in json_file:
                 try:
                     data = json.loads(line)

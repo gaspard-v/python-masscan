@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from data_saver import GENERAL_CALLBACK, SPECIAL_CALLBACK
 from typing import List
 import mariadb
-
+import asyncio
 
 async def __save_print(data: str, filename: str):
     print(f"{filename}: \"{ascii(data)}\"")
@@ -27,12 +27,6 @@ class save_mariadb:
         self.host = host
         self.database = database
         self.kwargs = kwargs
-
-    def __del__(self):
-        try:
-            asyncio.run(self.__disconnect())
-        except Exception as err:
-            pass
 
     async def __connect(self):
         self.conn = mariadb.connect(

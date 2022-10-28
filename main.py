@@ -12,6 +12,7 @@ import savers
 from data_saver import data_saver
 from utils import logrotate, add_success_callback
 import signal
+import logging
 
 SIGINT_RECEIVED = False
 

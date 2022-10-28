@@ -5,6 +5,8 @@ from typing import List, Union, Optional
 import asyncio
 from data_saver import data_saver
 import logging
+import threading
+from utils import between_callback
 
 
 class Nmapscan:
@@ -28,9 +30,15 @@ class Nmapscan:
         self.logger = logging.getLogger(__file__)
 
     async def start_scan(self):
+        event = threading.Event()
+        thread = threading.Thread(
+            target=between_callback, args=(self.__parse_open_proxy, event))
+        thread.start()
         subprocess.call([self.nmap_exec, *self.scan_parameters])
+        event.set()
+        thread.join()
 
-    async def get_open_proxy(self):
+    async def __parse_open_proxy(self, event):
         async def parseXml(data: str) -> Optional[Union[str, str, str, List[str]]]:
             try:
                 dom = xml.parseString(data)
@@ -56,34 +64,44 @@ class Nmapscan:
         data = ""
         record = False
         tasks = []
-        with open(self.output_xml_file_path, 'r') as file:
-            for line in file:
-                if "<host" in line:
-                    record = True
-                if record:
-                    data += line
-                if "</host>" in line:
-                    record = False
-                    result = await parseXml(data)
-                    if not result:
-                        continue
-                    (adresse, port, adresse_type, methodes) = result
-                    ip_type = 4 if "ipv4" in adresse_type else 6
-                    data = {
-                        "address": adresse,
-                        "ip_type": ip_type,
-                        "methodes": methodes
-                    }
-                    save_function = await self.save.special_save(
-                        data, self.output_open_proxy_file_path)
-                    save_function += await self.save.general_save(
-                        str(data), self.output_open_proxy_file_path)
-                    tasks += [asyncio.create_task(function())
-                              for function in save_function]
+        last_file_position = 0
+        while not event.is_set():
+            await asyncio.sleep(1)
+            try:
+                r = open(self.output_xml_file_path, 'r')
+            except Exception as err:
+                self.logger.debug(err)
+                continue
+            with r as file:
+                file.seek(last_file_position)
+                for line in file:
+                    if "<host" in line:
+                        record = True
+                    if record:
+                        data += line
+                    if "</host>" in line:
+                        record = False
+                        result = await parseXml(data)
+                        if not result:
+                            continue
+                        (adresse, port, adresse_type, methodes) = result
+                        ip_type = 4 if "ipv4" in adresse_type else 6
+                        data = {
+                            "address": adresse,
+                            "ip_type": ip_type,
+                            "methodes": methodes
+                        }
+                        save_function = await self.save.special_save(
+                            data, self.output_open_proxy_file_path)
+                        save_function += await self.save.general_save(
+                            str(data), self.output_open_proxy_file_path)
+                        tasks += [asyncio.create_task(function())
+                                  for function in save_function]
 
-                    data = ""
-        if len(tasks) != 0:
-            asyncio.gather(*tasks)
+                        data = ""
+                last_file_position = file.tell()
+            if len(tasks) != 0:
+                asyncio.gather(*tasks)
 
     async def delete_temporary_files(self):
         try:

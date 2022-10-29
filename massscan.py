@@ -23,7 +23,8 @@ class Masscan:
         self.logger = logging.getLogger(__file__)
 
     async def start_scan(self):
-        return subprocess.call([self.masscan_exec, *self.scan_parameters])
+        proc = await asyncio.create_subprocess_exec(self.masscan_exec, *self.scan_parameters)
+        return await proc.wait()
 
     async def transform_output_file(self):
         subprocess.call(

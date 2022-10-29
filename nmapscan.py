@@ -34,7 +34,8 @@ class Nmapscan:
         thread = threading.Thread(
             target=between_callback, args=(self.__parse_open_proxy, event))
         thread.start()
-        subprocess.call([self.nmap_exec, *self.scan_parameters])
+        proc = await asyncio.create_subprocess_exec(self.nmap_exec, *self.scan_parameters)
+        await proc.wait()
         event.set()
         thread.join()
 

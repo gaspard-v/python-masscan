@@ -13,6 +13,7 @@ from data_saver import data_saver
 from utils import logrotate, add_success_callback
 import signal
 import logging
+import logging.config
 
 SIGINT_RECEIVED = False
 
@@ -40,7 +41,7 @@ async def main():
     blacklist_file = "./ipblacklist.txt"
     port = 3128
     masscan_scan_arguments = ["--excludefile",
-                              blacklist_file, "--open-only",
+                              blacklist_file, "--open-only", "--wait", "10", "-vvv"
                               "--exclude", "255.255.255.255", "--capture", "html",
                               "--rate", "500000", "1.1.1.1/32"]
     nmap_executable = "nmap"
@@ -58,25 +59,23 @@ async def main():
 
     while not SIGINT_RECEIVED:
         try:
-            await masscan.start_scan()
+            masscan_result = await masscan.start_scan()
+            logger.debug(f"masscan exited, returned: {masscan_result}")
             await masscan.transform_output_file()
             tasks.append(asyncio.create_task(
                 masscan.delete_temporary_files()))
 
-            date_time = datetime.today().strftime("%d-%m-%Y_%H-%M-%S")
-            nmap_normal_output_file = f"./nmap_scan_{date_time}.txt"
-            nmap_xml_output_file = f"./nmap_scan_{date_time}.xml"
-            open_proxy_file = f"./open_proxy_{date_time}.txt"
+            # date_time = datetime.today().strftime("%d-%m-%Y_%H-%M-%S")
+            # nmap_normal_output_file = f"./nmap_scan_{date_time}.txt"
+            # nmap_xml_output_file = f"./nmap_scan_{date_time}.xml"
+            # open_proxy_file = f"./open_proxy_{date_time}.txt"
 
-            nmap = Nmapscan(nmap_executable, savers_obj, scan_file_plain,
-                            nmap_xml_output_file, nmap_normal_output_file,
-                            open_proxy_file, port, nmap_scan_arguments)
+            # nmap = Nmapscan(nmap_executable, savers_obj, scan_file_plain,
+            #                 nmap_xml_output_file, nmap_normal_output_file,
+            #                 open_proxy_file, port, nmap_scan_arguments)
 
-            await nmap.start_scan()
-            task = asyncio.create_task(nmap.get_open_proxy())
-            task = add_success_callback(task, nmap.delete_temporary_files)
-            tasks.append(task)
-            tasks.append(asyncio.create_task(logrotate([open_proxy_file])))
+            # await nmap.start_scan()
+            # tasks.append(asyncio.create_task(logrotate([open_proxy_file])))
         except Exception as err:
             logger.exception(err)
 

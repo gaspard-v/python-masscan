@@ -21,10 +21,17 @@ class Masscan:
         self.scan_parameters = [*scan_parameters,
                                 "-oB", output_bin_file_path, "-p", str(port)]
         self.logger = logging.getLogger(__file__)
+    
+    def __del__(self):
+        try:
+            os.kill(self.proc.pid, 9)
+        except Exception as err:
+            logging.debug(err)
 
     async def start_scan(self):
-        proc = await asyncio.create_subprocess_exec(self.masscan_exec, *self.scan_parameters)
-        return await proc.wait()
+        self.proc = await asyncio.create_subprocess_exec(self.masscan_exec, *self.scan_parameters)
+        result = await self.proc.communicate()
+        return result
 
     async def transform_output_file(self):
         subprocess.call(

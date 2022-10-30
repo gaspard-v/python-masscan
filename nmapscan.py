@@ -29,13 +29,19 @@ class Nmapscan:
         self.save = save
         self.logger = logging.getLogger(__file__)
 
+    def __del__(self):
+        try:
+            os.kill(self.proc.pid, 9)
+        except Exception as err:
+            logging.debug(err)
+
     async def start_scan(self):
         event = threading.Event()
         thread = threading.Thread(
             target=between_callback, args=(self.__parse_open_proxy, event))
         thread.start()
-        proc = await asyncio.create_subprocess_exec(self.nmap_exec, *self.scan_parameters)
-        await proc.wait()
+        self.proc = await asyncio.create_subprocess_exec(self.nmap_exec, *self.scan_parameters)
+        await self.proc.wait()
         event.set()
         thread.join()
 

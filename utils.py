@@ -32,4 +32,4 @@ def between_callback(callback, args):
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
     loop.run_until_complete(callback(args))
-    loop.close()
+    loop.stop()

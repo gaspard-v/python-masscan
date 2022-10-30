@@ -30,7 +30,7 @@ class Masscan:
 
     async def start_scan(self):
         self.proc = await asyncio.create_subprocess_exec(self.masscan_exec, *self.scan_parameters)
-        result = await self.proc.communicate()
+        result = await self.proc.wait()
         return result
 
     async def transform_output_file(self):

@@ -66,17 +66,17 @@ async def main():
             tasks.append(asyncio.create_task(
                 masscan.delete_temporary_files()))
 
-            # date_time = datetime.today().strftime("%d-%m-%Y_%H-%M-%S")
-            # nmap_normal_output_file = f"./nmap_scan_{date_time}.txt"
-            # nmap_xml_output_file = f"./nmap_scan_{date_time}.xml"
-            # open_proxy_file = f"./open_proxy_{date_time}.txt"
+            date_time = datetime.today().strftime("%d-%m-%Y_%H-%M-%S")
+            nmap_normal_output_file = f"./nmap_scan_{date_time}.txt"
+            nmap_xml_output_file = f"./nmap_scan_{date_time}.xml"
+            open_proxy_file = f"./open_proxy_{date_time}.txt"
 
-            # nmap = Nmapscan(nmap_executable, savers_obj, scan_file_plain,
-            #                 nmap_xml_output_file, nmap_normal_output_file,
-            #                 open_proxy_file, port, nmap_scan_arguments)
+            nmap = Nmapscan(nmap_executable, savers_obj, scan_file_plain,
+                            nmap_xml_output_file, nmap_normal_output_file,
+                            open_proxy_file, port, nmap_scan_arguments)
 
-            # await nmap.start_scan()
-            # tasks.append(asyncio.create_task(logrotate([open_proxy_file])))
+            await nmap.start_scan()
+            tasks.append(asyncio.create_task(logrotate([open_proxy_file])))
         except Exception as err:
             logger.exception(err)
 

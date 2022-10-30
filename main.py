@@ -14,6 +14,7 @@ from utils import logrotate, add_success_callback
 import signal
 import logging
 import logging.config
+import os
 
 SIGINT_RECEIVED = False
 
@@ -32,7 +33,7 @@ signal.signal(signal.SIGINT, sigint_handler)
 
 async def main():
     global SIGINT_RECEIVED
-    logging.config.fileConfig('logging.ini')
+    logging.config.fileConfig(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'logging.ini'))
     logger = logging.getLogger(__name__)
     masscan_executable = "masscan"
     scan_file_binary = "./masscan-open-proxy.bin"

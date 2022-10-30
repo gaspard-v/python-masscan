@@ -1,8 +1,5 @@
-from dataclasses import dataclass
-from data_saver import GENERAL_CALLBACK, SPECIAL_CALLBACK
-from typing import List
+from data_saver import GENERAL_CALLBACK, SPECIAL_CALLBACK, database_type
 import mariadb
-import asyncio
 import logging
 
 __logger = logging.getLogger(__file__)
@@ -21,12 +18,6 @@ async def __save_file(data: str, filename: str):
 
 
 class save_mariadb:
-
-    @dataclass
-    class database_type:
-        address: str
-        ip_type: int
-        methodes: List[str]
 
     def __init__(self, user: str, password: str, host: str, database: str, **kwargs):
         self.user = user
@@ -54,13 +45,10 @@ class save_mariadb:
     async def __save_mariadb(self, data: database_type, filename: str):
         try:
             await self.__connect()
-            address = data["address"]
-            ip_type = data["ip_type"]
-            methodes = data["methodes"]
-            methodes_str = " ".join(methodes)
+            methodes_str = " ".join(data.methodes)
             cur = self.conn.cursor(prepared=True)
             cur.callproc(
-                'add_proxy', (address, ip_type, methodes_str, filename))
+                'add_proxy', (data.address, data.port, data.ip_type, methodes_str, data.unix_date, filename))
             self.conn.commit()
             await self.__disconnect()
         except Exception as err:

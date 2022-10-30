@@ -1,7 +1,16 @@
-from typing import List, Callable, Awaitable
+from typing import List, Callable, Awaitable, Literal
+from dataclasses import dataclass
+
+@dataclass
+class database_type:
+    address: str
+    ip_type: Literal[4, 6]
+    methodes: List[str]
+    unix_date: int
+    port: int
 
 GENERAL_CALLBACK = Callable[[str, str], List[Awaitable[None]]]
-SPECIAL_CALLBACK = Callable[[dict, str], List[Awaitable[None]]]
+SPECIAL_CALLBACK = Callable[[database_type, str], List[Awaitable[None]]]
 
 
 class data_saver:

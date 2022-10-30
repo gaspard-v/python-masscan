@@ -1,9 +1,7 @@
-import subprocess
 import xml.dom.minidom as xml
 import os
-from typing import List, Union, Optional
 import asyncio
-from data_saver import data_saver
+from data_saver import data_saver, database_type
 import logging
 import threading
 from utils import between_callback
@@ -46,16 +44,18 @@ class Nmapscan:
         thread.join()
 
     async def __parse_open_proxy(self, event):
-        async def parseXml(data: str) -> Optional[Union[str, str, str, List[str]]]:
+        async def parseXml(data: str):
             try:
                 dom = xml.parseString(data)
                 [adresse_element] = dom.getElementsByTagName("address")
                 [port_element] = dom.getElementsByTagName("port")
                 [script_element] = dom.getElementsByTagName("script")
+                [host_element] = dom.getElementsByTagName("host")
                 port = port_element.getAttribute("portid")
                 adresse = adresse_element.getAttribute("addr")
                 adresse_type = adresse_element.getAttribute("addrtype")
                 script_id = script_element.getAttribute("id")
+                unix_date = host_element.getAttribute("endtime")
                 if not ("http-open-proxy" in script_id):
                     return None
                 script_output = script_element.getAttribute("output")
@@ -63,7 +63,8 @@ class Nmapscan:
                     [_, methode] = script_output.split(":")
                     methode = methode.strip()
                     methodes = methode.split(" ")
-                    return (adresse, port, adresse_type, methodes)
+                    ip_type = 4 if "ipv4" in adresse_type else 6
+                    return (adresse, int(port), ip_type, methodes, int(unix_date))
             except Exception as err:
                 self.logger.debug(err, stack_info=True)
             return None
@@ -91,13 +92,8 @@ class Nmapscan:
                         result = await parseXml(data)
                         if not result:
                             continue
-                        (adresse, port, adresse_type, methodes) = result
-                        ip_type = 4 if "ipv4" in adresse_type else 6
-                        data = {
-                            "address": adresse,
-                            "ip_type": ip_type,
-                            "methodes": methodes
-                        }
+                        (adresse, port, adresse_type, methodes, unix_date) = result
+                        data = database_type(adresse, adresse_type, methodes, unix_date, port)
                         save_function = await self.save.special_save(
                             data, self.output_open_proxy_file_path)
                         save_function += await self.save.general_save(

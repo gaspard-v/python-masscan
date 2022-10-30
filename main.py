@@ -44,7 +44,7 @@ async def main():
     masscan_scan_arguments = ["--excludefile",
                               blacklist_file, "--open-only", "--wait", "10", "-vvv", 
                               "--exclude", "255.255.255.255", "--capture", "html",
-                              "--rate", "500000", "1.1.1.1/32"]
+                              "--rate", "500000", "109.89.134.154/32"]
     nmap_executable = "nmap"
     nmap_scan_arguments = ["-vvv", "-n", "-T4", "--script", "http-open-proxy.nse",
                            "--open", "-Pn", "-sS"]

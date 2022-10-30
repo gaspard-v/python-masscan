@@ -79,7 +79,7 @@ async def main():
             tasks.append(asyncio.create_task(nmap.delete_temporary_files()))
             tasks.append(asyncio.create_task(logrotate([open_proxy_file])))
         except Exception as err:
-            logger.exception(err)
+            logger.exception(err, stack_info=True)
 
     print("finishing all tasks ...")
     await asyncio.gather(*tasks)

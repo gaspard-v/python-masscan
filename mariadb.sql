@@ -24,10 +24,12 @@ CREATE TABLE data (
 );
 
 DELIMITER //
-CREATE PROCEDURE add_proxy (IN address VARCHAR(50), IN ip_type TINYINT, IN methodes VARCHAR(100), IN commentaire TEXT)
+CREATE PROCEDURE add_proxy (IN address VARCHAR(50), IN ip_type TINYINT, IN methodes VARCHAR(100), IN scan_date BIGINT, IN commentaire TEXT)
 BEGIN
-    INSERT INTO proxy (address, ip_type, methodes, commentaire) VALUES (address, ip_type, methodes, commentaire)
-    ON DUPLICATE KEY UPDATE id=id, update_date=NOW(), commentaire=commentaire, methodes=methodes, update_count=update_count+1;
+    DECLARE var_scan_date DATETIME;
+    SET var_scan_date = FROM_UNIXTIME(scan_date);
+    INSERT INTO proxy (address, ip_type, methodes, commentaire, add_date, update_date) VALUES (address, ip_type, methodes, commentaire, var_scan_date, var_scan_date)
+    ON DUPLICATE KEY UPDATE id=id, update_date=var_scan_date, commentaire=commentaire, methodes=methodes, update_count=update_count+1;
 END; //
 
 CREATE PROCEDURE add_data (IN data LONGBLOB, IN filename TEXT, IN commentaire TEXT)

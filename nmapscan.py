@@ -107,9 +107,10 @@ class Nmapscan:
                 asyncio.gather(*tasks)
 
     async def delete_temporary_files(self):
+        return
         try:
             os.remove(self.input_plain_ip_file_path)
-            # os.remove(self.output_xml_file_path)
+            os.remove(self.output_xml_file_path)
             os.remove(self.output_plain_file_path)
         except Exception as err:
             self.logger.warning(err, stack_info=True)

@@ -47,6 +47,7 @@ class Masscan:
                 plain_file.write(f"{data['ip']}\n")
 
     async def delete_temporary_files(self):
+        return
         try:
             os.remove(self.output_json_file_path)
             os.remove(self.output_bin_file_path)

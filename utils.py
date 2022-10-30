@@ -9,6 +9,8 @@ __logger = logging.getLogger(__file__)
 
 async def logrotate(files: List[str]):
     for file in files:
+        if not os.path.exists(file):
+            continue
         try:
             with tarfile.open(f"{file}.tar.xz", 'x:xz') as tar_file:
                 tar_file.add(file)

@@ -104,7 +104,7 @@ class Nmapscan:
                         data = ""
                 last_file_position = file.tell()
             if len(tasks) != 0:
-                asyncio.gather(*tasks)
+                await asyncio.gather(*tasks)
 
     async def delete_temporary_files(self):
         return

@@ -49,19 +49,22 @@ class save_mariadb:
             self.conn.commit()
             self.conn.close()
         except Exception as err:
-            __logger.warning(err)
+            __logger.warning(err, stack_info=True)
 
     async def __save_mariadb(self, data: database_type, filename: str):
-        await self.__connect()
-        address = data["address"]
-        ip_type = data["ip_type"]
-        methodes = data["methodes"]
-        methodes_str = " ".join(methodes)
-        cur = self.conn.cursor(prepared=True)
-        cur.callproc(
-            'add_proxy', (address, ip_type, methodes_str, filename))
-        self.conn.commit()
-        await self.__disconnect()
+        try:
+            await self.__connect()
+            address = data["address"]
+            ip_type = data["ip_type"]
+            methodes = data["methodes"]
+            methodes_str = " ".join(methodes)
+            cur = self.conn.cursor(prepared=True)
+            cur.callproc(
+                'add_proxy', (address, ip_type, methodes_str, filename))
+            self.conn.commit()
+            await self.__disconnect()
+        except Exception as err:
+            __logger.error(err, stack_info=True)
 
     save_mariadb: SPECIAL_CALLBACK = __save_mariadb
 

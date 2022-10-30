@@ -3,7 +3,9 @@ from typing import List
 import sys
 import tarfile
 import asyncio
+import logging
 
+__logger = logging.getLogger(__file__)
 
 async def logrotate(files: List[str]):
     for file in files:
@@ -15,7 +17,7 @@ async def logrotate(files: List[str]):
             print(f"file {file} not found.\nError message: {err}",
                   file=sys.stderr)
         except Exception as err:
-            print(err, file=sys.stderr)
+            __logger.debug(err, stack_info=True)
 
 
 async def add_success_callback(fut, callback):

@@ -34,7 +34,7 @@ signal.signal(signal.SIGINT, sigint_handler)
 async def main():
     global SIGINT_RECEIVED
     logging.config.fileConfig(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'logging.ini'))
-    logger = logging.getLogger(__name__)
+    logger = logging.getLogger(__file__)
     masscan_executable = "masscan"
     scan_file_binary = "./masscan-open-proxy.bin"
     scan_file_json = "./masscan-open-proxy.json"
@@ -76,6 +76,7 @@ async def main():
                             open_proxy_file, port, nmap_scan_arguments)
 
             await nmap.start_scan()
+            tasks.append(asyncio.create_task(nmap.delete_temporary_files()))
             tasks.append(asyncio.create_task(logrotate([open_proxy_file])))
         except Exception as err:
             logger.exception(err)

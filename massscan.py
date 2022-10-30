@@ -26,7 +26,7 @@ class Masscan:
         try:
             os.kill(self.proc.pid, 9)
         except Exception as err:
-            logging.debug(err)
+            logging.debug(err, stack_info=True)
 
     async def start_scan(self):
         self.proc = await asyncio.create_subprocess_exec(self.masscan_exec, *self.scan_parameters)
@@ -42,7 +42,7 @@ class Masscan:
                 try:
                     data = json.loads(line)
                 except Exception as err:
-                    self.logger.debug(err)
+                    self.logger.debug(err, stack_info=True)
                     continue
                 plain_file.write(f"{data['ip']}\n")
 
@@ -51,4 +51,4 @@ class Masscan:
             os.remove(self.output_json_file_path)
             os.remove(self.output_bin_file_path)
         except Exception as err:
-            self.logger.warning(err)
+            self.logger.warning(err, stack_info=True)

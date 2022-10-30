@@ -33,7 +33,7 @@ class Nmapscan:
         try:
             os.kill(self.proc.pid, 9)
         except Exception as err:
-            logging.debug(err)
+            logging.debug(err, stack_info=True)
 
     async def start_scan(self):
         event = threading.Event()
@@ -65,7 +65,7 @@ class Nmapscan:
                     methodes = methode.split(" ")
                     return (adresse, port, adresse_type, methodes)
             except Exception as err:
-                self.logger.debug(err)
+                self.logger.debug(err, stack_info=True)
             return None
 
         data = ""
@@ -77,7 +77,7 @@ class Nmapscan:
             try:
                 r = open(self.output_xml_file_path, 'r')
             except Exception as err:
-                self.logger.debug(err)
+                self.logger.debug(err, stack_info=True)
                 continue
             with r as file:
                 file.seek(last_file_position)
@@ -116,4 +116,4 @@ class Nmapscan:
             os.remove(self.output_xml_file_path)
             os.remove(self.output_plain_file_path)
         except Exception as err:
-            self.logger.warning(err)
+            self.logger.warning(err, stack_info=True)

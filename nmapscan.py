@@ -98,13 +98,12 @@ class Nmapscan:
                             data, self.output_open_proxy_file_path)
                         save_function += await self.save.general_save(
                             str(data), self.output_open_proxy_file_path)
-                        tasks += [asyncio.create_task(function())
-                                  for function in save_function]
+                        tasks += [asyncio.create_task(func)
+                                  for func in save_function]
 
                         data = ""
                 last_file_position = file.tell()
-            if len(tasks) != 0:
-                await asyncio.gather(*tasks)
+        await asyncio.gather(*tasks)
 
     async def delete_temporary_files(self):
         return

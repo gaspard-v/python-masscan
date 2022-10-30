@@ -42,7 +42,7 @@ async def main():
     blacklist_file = "./ipblacklist.txt"
     port = 3128
     masscan_scan_arguments = ["--excludefile",
-                              blacklist_file, "--open-only", "--wait", "10", "-vvv"
+                              blacklist_file, "--open-only", "--wait", "10", "-vvv", 
                               "--exclude", "255.255.255.255", "--capture", "html",
                               "--rate", "500000", "1.1.1.1/32"]
     nmap_executable = "nmap"

@@ -1,5 +1,4 @@
 import asyncio
-import subprocess
 import os
 from typing import List
 import json
@@ -21,10 +20,11 @@ class Masscan:
         self.scan_parameters = [*scan_parameters,
                                 "-oB", output_bin_file_path, "-p", str(port)]
         self.logger = logging.getLogger(__file__)
-    
+
     def __del__(self):
         try:
-            os.kill(self.proc.pid, 9)
+            if self.proc.returncode is not None:
+                os.kill(self.proc.pid, 9)
         except Exception as err:
             logging.debug(err, stack_info=True)
 
@@ -34,9 +34,8 @@ class Masscan:
         return result
 
     async def transform_output_file(self):
-        subprocess.call(
-            [self.masscan_exec, "--readscan",
-             self.output_bin_file_path, "-oJ", self.output_json_file_path])
+        self.proc = await asyncio.create_subprocess_exec(self.masscan_exec, "--readscan", self.output_bin_file_path, "-oJ", self.output_json_file_path)
+        await self.proc.wait()
         with open(self.output_json_file_path, 'r') as json_file, open(self.output_plain_file_path, 'w+') as plain_file:
             for line in json_file:
                 try:

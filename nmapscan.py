@@ -29,7 +29,8 @@ class Nmapscan:
 
     def __del__(self):
         try:
-            os.kill(self.proc.pid, 9)
+            if self.proc.returncode is not None:
+                os.kill(self.proc.pid, 9)
         except Exception as err:
             logging.debug(err, stack_info=True)
 
@@ -93,7 +94,8 @@ class Nmapscan:
                         if not result:
                             continue
                         (adresse, port, adresse_type, methodes, unix_date) = result
-                        data = database_type(adresse, adresse_type, methodes, unix_date, port)
+                        data = database_type(
+                            adresse, adresse_type, methodes, unix_date, port)
                         save_function = await self.save.special_save(
                             data, self.output_open_proxy_file_path)
                         save_function += await self.save.general_save(

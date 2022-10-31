@@ -7,7 +7,7 @@ CREATE TABLE proxy (
     port INT UNSIGNED NOT NULL CHECK (port > 0 AND port < 65356),
     ip_type TINYINT NOT NULL DEFAULT 4,
     methodes TEXT NOT NULL,
-    commentaire VARCHAR(100),
+    commentaire TEXT,
     add_date DATETIME NOT NULL DEFAULT NOW(),
     update_date DATETIME NOT NULL DEFAULT NOW(),
     update_count INT UNSIGNED NOT NULL DEFAULT 0,

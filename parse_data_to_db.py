@@ -2,7 +2,7 @@
 
 
 import asyncio
-import xml
+import xml.dom.minidom as xml
 from data_saver import data_saver, database_type
 import savers
 from utils import between_callback

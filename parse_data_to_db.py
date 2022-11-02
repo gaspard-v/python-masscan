@@ -58,8 +58,8 @@ async def parse_open_proxy(event):
     saver = data_saver(
         [savers.save_file, savers.save_print], [db.save_mariadb])
     logger = logging.getLogger("parse_open_proxy")
-    output_xml_file_path = "open-proxy.txt"
-    output_open_proxy_file_path = "open-proxy_13-10-2022_18-21-39.xml"
+    output_open_proxy_file_path = "open-proxy.txt"
+    output_xml_file_path = "open-proxy_13-10-2022_18-21-39.xml"
     data = ""
     record = False
     tasks = []

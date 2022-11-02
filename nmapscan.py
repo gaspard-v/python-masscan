@@ -92,20 +92,20 @@ class Nmapscan:
                         if "</host>" in line:
                             record = False
                             result = await parseXml(data)
+                            data = ""
                             if not result:
                                 continue
                             (adresse, port, adresse_type,
                              methodes, unix_date) = result
-                            data = database_type(
+                            output = database_type(
                                 adresse, adresse_type, methodes, unix_date, port)
                             save_function = await self.save.special_save(
-                                data, self.output_open_proxy_file_path)
+                                output, self.output_open_proxy_file_path)
                             save_function += await self.save.general_save(
-                                str(data), self.output_open_proxy_file_path)
+                                str(output), self.output_open_proxy_file_path)
                             tasks += [asyncio.create_task(func)
                                       for func in save_function]
 
-                            data = ""
                     last_file_position = file.tell()
             except Exception as err:
                 self.logger.error(err, stack_info=True)

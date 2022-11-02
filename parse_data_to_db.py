@@ -59,7 +59,7 @@ async def parse_open_proxy(event):
         [savers.save_file, savers.save_print], [db.save_mariadb])
     logger = logging.getLogger("parse_open_proxy")
     output_open_proxy_file_path = "open-proxy.txt"
-    output_xml_file_path = "open-proxy_13-10-2022_18-21-39.xml"
+    output_xml_file_path = "test.xml"
     data = ""
     record = False
     tasks = []
@@ -82,20 +82,19 @@ async def parse_open_proxy(event):
                     if "</host>" in line:
                         record = False
                         result = await parseXml(data)
+                        data = ""
                         if not result:
                             continue
                         (adresse, port, adresse_type,
                          methodes, unix_date) = result
-                        data = database_type(
+                        output = database_type(
                             adresse, adresse_type, methodes, unix_date, port)
                         save_function = await saver.special_save(
-                            data, output_open_proxy_file_path)
+                            output, output_open_proxy_file_path)
                         save_function += await saver.general_save(
-                            str(data), output_open_proxy_file_path)
+                            str(output), output_open_proxy_file_path)
                         tasks += [asyncio.create_task(func)
                                   for func in save_function]
-
-                        data = ""
                 last_file_position = file.tell()
         except Exception as err:
             logger.error(err, stack_info=True)
@@ -116,7 +115,7 @@ async def main():
             target=between_callback, args=(parse_open_proxy, event))
         thread.start()
         while not SIGINT_RECEIVED:
-            await asyncio.wait(1)
+            await asyncio.sleep(1)
         event.set()
         thread.join()
     except Exception as err:

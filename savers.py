@@ -2,19 +2,18 @@ from data_saver import GENERAL_CALLBACK, SPECIAL_CALLBACK, database_type
 import mariadb
 import logging
 
-__logger = logging.getLogger(__file__)
-
 
 async def __save_print(data: str, filename: str):
     print(f"{filename}: \"{ascii(data)}\"")
 
 
 async def __save_file(data: str, filename: str):
+    logger = logging.getLogger()
     try:
         with open(filename, "a+") as file:
             file.write(data)
     except Exception as err:
-        __logger.warning(err)
+        logger.warning(err)
 
 
 class save_mariadb:
@@ -25,6 +24,7 @@ class save_mariadb:
         self.host = host
         self.database = database
         self.kwargs = kwargs
+        self.logger = logging.getLogger(__file__)
 
     async def __connect(self):
         self.conn = mariadb.connect(
@@ -40,7 +40,7 @@ class save_mariadb:
             self.conn.commit()
             self.conn.close()
         except Exception as err:
-            __logger.warning(err, stack_info=True)
+            self.logger.warning(err, stack_info=True)
 
     async def __save_mariadb(self, data: database_type, filename: str):
         try:
@@ -52,7 +52,7 @@ class save_mariadb:
             self.conn.commit()
             await self.__disconnect()
         except Exception as err:
-            __logger.error(err, stack_info=True)
+            self.logger.error(err, stack_info=True)
 
     save_mariadb: SPECIAL_CALLBACK = __save_mariadb
 

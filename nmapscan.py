@@ -75,42 +75,49 @@ class Nmapscan:
         tasks = []
         last_file_position = 0
         while not event.is_set():
-            await asyncio.sleep(1)
             try:
-                r = open(self.output_xml_file_path, 'r')
-            except Exception as err:
-                self.logger.debug(err, stack_info=True)
-                continue
-            with r as file:
-                file.seek(last_file_position)
-                for line in file:
-                    if "<host" in line:
-                        record = True
-                    if record:
-                        data += line
-                    if "</host>" in line:
-                        record = False
-                        result = await parseXml(data)
-                        if not result:
-                            continue
-                        (adresse, port, adresse_type, methodes, unix_date) = result
-                        data = database_type(
-                            adresse, adresse_type, methodes, unix_date, port)
-                        save_function = await self.save.special_save(
-                            data, self.output_open_proxy_file_path)
-                        save_function += await self.save.general_save(
-                            str(data), self.output_open_proxy_file_path)
-                        tasks += [asyncio.create_task(func)
-                                  for func in save_function]
+                await asyncio.sleep(1)
+                try:
+                    r = open(self.output_xml_file_path, 'r')
+                except Exception as err:
+                    self.logger.debug(err, stack_info=True)
+                    continue
+                with r as file:
+                    file.seek(last_file_position)
+                    for line in file:
+                        if "<host" in line:
+                            record = True
+                        if record:
+                            data += line
+                        if "</host>" in line:
+                            record = False
+                            result = await parseXml(data)
+                            if not result:
+                                continue
+                            (adresse, port, adresse_type,
+                             methodes, unix_date) = result
+                            data = database_type(
+                                adresse, adresse_type, methodes, unix_date, port)
+                            save_function = await self.save.special_save(
+                                data, self.output_open_proxy_file_path)
+                            save_function += await self.save.general_save(
+                                str(data), self.output_open_proxy_file_path)
+                            tasks += [asyncio.create_task(func)
+                                      for func in save_function]
 
-                        data = ""
-                last_file_position = file.tell()
-        await asyncio.gather(*tasks)
+                            data = ""
+                    last_file_position = file.tell()
+            except Exception as err:
+                self.logger.error(err, stack_info=True)
+        try:
+            await asyncio.gather(*tasks)
+        except Exception as err:
+            self.logger.error(err, stack_info=True)
 
     async def delete_temporary_files(self):
         try:
             os.remove(self.input_plain_ip_file_path)
-            os.remove(self.output_xml_file_path)
+            # os.remove(self.output_xml_file_path)
             os.remove(self.output_plain_file_path)
         except Exception as err:
             self.logger.warning(err, stack_info=True)

@@ -9,6 +9,22 @@ from utils import between_callback
 import logging
 import logging.config
 import os
+import threading
+import signal
+
+SIGINT_RECEIVED = False
+
+
+def sigint_handler(signum, frame):
+    global SIGINT_RECEIVED
+    if SIGINT_RECEIVED:
+        exit(1)
+    print("Recieved SIGINT, program is closing...")
+    print("press CTRL+C to force the shutdown")
+    SIGINT_RECEIVED = True
+
+
+signal.signal(signal.SIGINT, sigint_handler)
 
 
 async def parse_open_proxy(event):
@@ -90,6 +106,7 @@ async def parse_open_proxy(event):
 
 
 async def main():
+    global SIGINT_RECEIVED
     logging.config.fileConfig(os.path.join(
         os.path.dirname(os.path.realpath(__file__)), 'logging.ini'))
     logger = logging.getLogger(__file__)
@@ -98,6 +115,8 @@ async def main():
         thread = threading.Thread(
             target=between_callback, args=(parse_open_proxy, event))
         thread.start()
+        while not SIGINT_RECEIVED:
+            await asyncio.wait(1)
         event.set()
         thread.join()
     except Exception as err:

@@ -7,6 +7,7 @@ from data_saver import data_saver, database_type
 import savers
 from utils import between_callback
 import logging
+import logging.config
 
 
 async def parse_open_proxy(event):

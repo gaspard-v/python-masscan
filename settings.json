@@ -1,0 +1,20 @@
+{
+    "logging_file": "logging.ini",
+    "masscan_executable": "masscan",
+    "masscan_binary_file": "./masscan-open-proxy.bin",
+    "masscan_json_file": "./masscan-open-proxy.json",
+    "masscan_plain_file": "./masscan-open-proxy.txt",
+    "blacklist_file": "./ipblacklist.txt",
+    "port": 3128,
+    "type": "http",
+    "mariadb_user": "openproxy",
+    "mariadb_password": "parN4Tm#wDzGoPo$wJ%b7DU",
+    "mariadb_host": "home.xosh.fr",
+    "mariadb_database": "openproxy",
+    "mariadb_kwargs": {
+        "autocommit": true
+    },
+    "nmap_plain_file": "./nmap_scan_{date_time}.txt",
+    "nmap_xml_file": "./nmap_scan_{date_time}.xml",
+    "open_proxy_file": "./open_proxy_{date_time}.txt"
+}

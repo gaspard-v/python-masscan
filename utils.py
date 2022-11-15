@@ -4,6 +4,8 @@ import sys
 import tarfile
 import asyncio
 import logging
+import datetime
+from string import Template
 
 __logger = logging.getLogger(__file__)
 
@@ -21,6 +23,14 @@ async def logrotate(files: List[str]):
         except Exception as err:
             __logger.debug(err, stack_info=True)
 
+async def parse_settings_string(setting_string):
+    try:
+        date_time = datetime.today().strftime("%d-%m-%Y_%H-%M-%S")
+        template = Template(setting_string)
+        return template.substitute(DATETIME=date_time)
+    except Exception as err:
+        __logger.exception(err)
+        exit(1)
 
 async def add_success_callback(fut, callback):
     result = await fut

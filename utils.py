@@ -25,7 +25,7 @@ async def logrotate(files: List[str]):
 
 async def parse_settings_string(setting_string):
     try:
-        date_time = datetime.today().strftime("%d-%m-%Y_%H-%M-%S")
+        date_time = datetime.date.today().strftime("%d-%m-%Y_%H-%M-%S")
         template = Template(setting_string)
         return template.substitute(DATETIME=date_time)
     except Exception as err:

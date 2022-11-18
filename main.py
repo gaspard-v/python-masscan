@@ -45,13 +45,9 @@ async def main():
     nmap_scan_arguments = ["-vvv", "-n", "-T4", "--script", "http-open-proxy.nse",
                            "--open", "-Pn", "-sS"]
     
-    mariadb_user = await parse_settings_string(settings['mariadb_user'])
-    mariadb_password = await parse_settings_string(settings['mariadb_password'])
-    mariadb_host = await parse_settings_string(settings['mariadb_host'])
-    mariadb_database = await parse_settings_string(settings['mariadb_database'])
     mariadb_kwargs = settings['mariadb_kwargs']
-    db = savers.save_mariadb(mariadb_user, mariadb_password,
-                             mariadb_host, mariadb_database, **mariadb_kwargs)
+    db = savers.save_mariadb(settings['mariadb_user'], settings['mariadb_password'],
+                             settings['mariadb_host'], settings['mariadb_database'], **mariadb_kwargs)
     savers_obj = data_saver(
         [savers.save_file, savers.save_print], [db.save_mariadb])
 

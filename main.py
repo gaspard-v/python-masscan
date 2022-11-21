@@ -14,11 +14,11 @@ from utils import logrotate, parse_settings_string
 import signal
 import logging
 import logging.config
-import os
 import json
+import argparse
+import os
 
 SIGINT_RECEIVED = False
-
 
 def sigint_handler(signum, frame):
     global SIGINT_RECEIVED
@@ -31,12 +31,28 @@ def sigint_handler(signum, frame):
 
 signal.signal(signal.SIGINT, sigint_handler)
 
+async def parse_arguments():
+    default_settings_file = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'settings.json')
+    parser = argparse.ArgumentParser(prog="open-proxy", 
+                                     description="Search open proxies on the Internet through masscan and nmap", 
+                                     epilog="open-proxy scanner")
+
+    parser.add_argument('--settings', 
+                        help=f"Specify the settings file, it should be a filepath like \"/path/to/settings.json\". \
+                               Default path is \"{default_settings_file}\"",
+                        type=argparse.FileType(mode='r', encoding='utf-8'),
+                        required=False,
+                        default=default_settings_file)
+    parser.add_argument('--version', action='version', version='%(prog)s 1.0')
+    args = parser.parse_args()
+    return args
+
 
 async def main():
     global SIGINT_RECEIVED
-    with open(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'settings.json')) as settings_file:
-        settings = json.load(settings_file)
-    logging.config.fileConfig(os.path.join(os.path.dirname(os.path.realpath(__file__)), await parse_settings_string(settings['logging_file'])))
+    script_args = await parse_arguments()
+    settings = json.load(script_args.settings)
+    logging.config.fileConfig(await parse_settings_string(settings['logging_file']))
     logger = logging.getLogger(__file__)
     masscan_executable = await parse_settings_string(settings['masscan_executable'])
 

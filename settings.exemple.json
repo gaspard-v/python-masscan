@@ -1,0 +1,21 @@
+{
+  "logging_file": "logging.ini",
+  "masscan_executable": "masscan",
+  "masscan_binary_file": "./masscan-open-proxy.bin",
+  "masscan_json_file": "./masscan-open-proxy.json",
+  "masscan_plain_file": "./masscan-open-proxy.txt",
+  "blacklist_file": "./ipblacklist.txt",
+  "port": 3128,
+  "type": "http",
+  "mariadb_user": "openproxy",
+  "mariadb_password": "password",
+  "mariadb_host": "exemple.com",
+  "mariadb_database": "openproxy",
+  "mariadb_kwargs": {
+    "autocommit": true
+  },
+  "nmap_executable": "nmap",
+  "nmap_plain_file": "./nmap_scan_$DATETIME.txt",
+  "nmap_xml_file": "./nmap_scan_$DATETIME.xml",
+  "open_proxy_file": "./open_proxy_$DATETIME.txt"
+}

@@ -1,6 +1,5 @@
 import asyncio
 import os
-from typing import List
 import json
 import logging
 

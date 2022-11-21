@@ -1,10 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-# openproxy
-# parN4Tm#wDzGoPo$wJ%b7DU
-
-from datetime import datetime
 import asyncio
 from nmapscan import Nmapscan
 from massscan import Masscan

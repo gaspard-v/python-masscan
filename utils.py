@@ -4,7 +4,7 @@ import sys
 import tarfile
 import asyncio
 import logging
-import datetime
+from datetime import datetime
 from string import Template
 
 __logger = logging.getLogger(__file__)
@@ -25,7 +25,7 @@ async def logrotate(files: List[str]):
 
 async def parse_settings_string(setting_string):
     try:
-        date_time = datetime.date.today().strftime("%d-%m-%Y_%H-%M-%S")
+        date_time = datetime.today().strftime("%d-%m-%Y_%H-%M-%S")
         template = Template(setting_string)
         return template.substitute(DATETIME=date_time)
     except Exception as err:

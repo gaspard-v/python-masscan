@@ -5,6 +5,7 @@ from data_saver import data_saver, database_type
 import logging
 import threading
 from utils import between_callback
+import aiofiles.os
 
 
 class Nmapscan:
@@ -122,8 +123,8 @@ class Nmapscan:
 
     async def delete_temporary_files(self):
         try:
-            os.remove(self.input_plain_ip_file_path)
-            os.remove(self.output_xml_file_path)
-            os.remove(self.output_plain_file_path)
+            aiofiles.os.remove(self.input_plain_ip_file_path)
+            aiofiles.os.remove(self.output_xml_file_path)
+            aiofiles.os.remove(self.output_plain_file_path)
         except Exception as err:
             self.logger.warning(err, stack_info=True)

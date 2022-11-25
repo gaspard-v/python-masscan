@@ -2,6 +2,7 @@ import asyncio
 import os
 import json
 import logging
+import aiofiles.os
 
 
 class Masscan:
@@ -53,7 +54,7 @@ class Masscan:
 
     async def delete_temporary_files(self):
         try:
-            os.remove(self.output_json_file_path)
-            os.remove(self.output_bin_file_path)
+            aiofiles.os.remove(self.output_json_file_path)
+            aiofiles.os.remove(self.output_bin_file_path)
         except Exception as err:
             self.logger.warning(err, stack_info=True)

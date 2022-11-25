@@ -15,6 +15,7 @@ class Nmapscan:
                  output_plain_file_path: str = "./nmap-scan.txt",
                  output_open_proxy_file_path: str = "./open-proxy.txt",
                  port: int = 3128,
+                 active_stdout_stderr = (True, True),
                  scan_parameters=[]):
 
         self.nmap_exec = nmap_exec
@@ -26,6 +27,10 @@ class Nmapscan:
         self.output_open_proxy_file_path = output_open_proxy_file_path
         self.save = save
         self.logger = logging.getLogger(__file__)
+        self.active_stdout_stderr = (
+                asyncio.subprocess.PIPE if active_stdout_stderr[0] else None, 
+                asyncio.subprocess.PIPE if active_stdout_stderr[1] else None
+                )
 
     def __del__(self):
         try:
@@ -39,7 +44,8 @@ class Nmapscan:
         thread = threading.Thread(
             target=between_callback, args=(self.__parse_open_proxy, event))
         thread.start()
-        self.proc = await asyncio.create_subprocess_exec(self.nmap_exec, *self.scan_parameters)
+        (p_stdout, p_stderr) = self.active_stdout_stderr
+        self.proc = await asyncio.create_subprocess_exec(self.nmap_exec, *self.scan_parameters, stdout=p_stdout, stderr=p_stderr)
         await self.proc.wait()
         event.set()
         thread.join()

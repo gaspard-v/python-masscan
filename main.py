@@ -54,14 +54,15 @@ async def main():
 
     port = settings['port']
     nmap_executable = await parse_settings_string(settings['nmap_executable'])
-    nmap_scan_arguments = ["-vvv", "-n", "-T4", "--script", "http-open-proxy.nse",
+    nmap_scan_arguments = ["-n", "-T4", "--script", "http-open-proxy.nse",
                            "--open", "-Pn", "-sS"]
+    nmap_scan_arguments += settings["nmap_additional_args"]
     
     mariadb_kwargs = settings['mariadb_kwargs']
     db = savers.save_mariadb(settings['mariadb_user'], settings['mariadb_password'],
                              settings['mariadb_host'], settings['mariadb_database'], **mariadb_kwargs)
     savers_obj = data_saver(
-        [savers.save_file, savers.save_print], [db.save_mariadb])
+        [savers.save_file], [db.save_mariadb])
 
     tasks = []
 
@@ -72,11 +73,12 @@ async def main():
             scan_file_plain = await parse_settings_string(settings['masscan_plain_file'])
             blacklist_file = await parse_settings_string(settings['blacklist_file'])
             masscan_scan_arguments = ["--excludefile",
-                                    blacklist_file, "--open-only", "--wait", "10", "-vvv", 
+                                    blacklist_file, "--open-only", "--wait", "10", 
                                     "--exclude", "255.255.255.255", "--capture", "html",
                                     "--rate", "500000", "0.0.0.0/0"]
+            masscan_scan_arguments += settings["masscan_additional_args"]
             masscan = Masscan(masscan_executable, scan_file_binary,
-                              scan_file_json, scan_file_plain, port, masscan_scan_arguments)
+                              scan_file_json, scan_file_plain, port, (settings["print_stdout"], settings["print_stderr"]) , masscan_scan_arguments)
             masscan_result = await masscan.start_scan()
             logger.debug(f"masscan exited, returned: {masscan_result}")
             await masscan.transform_output_file()
@@ -89,13 +91,13 @@ async def main():
 
             nmap = Nmapscan(nmap_executable, savers_obj, scan_file_plain,
                             nmap_xml_output_file, nmap_normal_output_file,
-                            open_proxy_file, port, nmap_scan_arguments)
+                            open_proxy_file, port, (settings["print_stdout"], settings["print_stderr"]), nmap_scan_arguments)
 
             await nmap.start_scan()
             tasks.append(asyncio.create_task(nmap.delete_temporary_files()))
             tasks.append(asyncio.create_task(logrotate([open_proxy_file])))
         except Exception as err:
-            logger.exception(err, stack_info=True)
+            logger.exception(err)
 
     print("finishing all tasks ...")
     await asyncio.gather(*tasks)

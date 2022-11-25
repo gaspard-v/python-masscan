@@ -18,10 +18,9 @@ async def logrotate(files: List[str]):
                 tar_file.add(file)
             os.remove(file)
         except FileNotFoundError as err:
-            print(f"file {file} not found.\nError message: {err}",
-                  file=sys.stderr)
+            __logger.warning(err, stack_info=True)
         except Exception as err:
-            __logger.debug(err, stack_info=True)
+            __logger.error(err, stack_info=True)
 
 async def parse_settings_string(setting_string):
     try:

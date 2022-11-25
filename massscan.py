@@ -10,6 +10,7 @@ class Masscan:
                  output_json_file_path: str = "./masscan-scan-file.json",
                  output_plain_file_path: str = "./masscan-scan-file.txt",
                  port: int = 3128,
+                 active_stdout_stderr = (True, True),
                  scan_parameters=[]):
         self.masscan_exec = masscan_exec
         self.output_json_file_path = output_json_file_path
@@ -19,6 +20,10 @@ class Masscan:
         self.scan_parameters = [*scan_parameters,
                                 "-oB", output_bin_file_path, "-p", str(port)]
         self.logger = logging.getLogger(__file__)
+        self.active_stdout_stderr = (
+                asyncio.subprocess.PIPE if active_stdout_stderr[0] else None, 
+                asyncio.subprocess.PIPE if active_stdout_stderr[1] else None
+                )
 
     def __del__(self):
         try:
@@ -28,12 +33,14 @@ class Masscan:
             logging.debug(err, stack_info=True)
 
     async def start_scan(self):
-        self.proc = await asyncio.create_subprocess_exec(self.masscan_exec, *self.scan_parameters)
+        (p_stdout, p_stderr) = self.active_stdout_stderr
+        self.proc = await asyncio.create_subprocess_exec(self.masscan_exec, *self.scan_parameters, stdout=p_stdout, stderr=p_stderr)
         result = await self.proc.wait()
         return result
 
     async def transform_output_file(self):
-        self.proc = await asyncio.create_subprocess_exec(self.masscan_exec, "--readscan", self.output_bin_file_path, "-oJ", self.output_json_file_path)
+        (p_stdout, p_stderr) = self.active_stdout_stderr
+        self.proc = await asyncio.create_subprocess_exec(self.masscan_exec, "--readscan", self.output_bin_file_path, "-oJ", self.output_json_file_path, stdout=p_stdout, stderr=p_stderr)
         await self.proc.wait()
         with open(self.output_json_file_path, 'r') as json_file, open(self.output_plain_file_path, 'w+') as plain_file:
             for line in json_file:

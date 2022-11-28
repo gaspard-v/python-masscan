@@ -6,6 +6,7 @@ import logging
 import threading
 from utils import between_callback
 import aiofiles.os
+import aiofiles
 
 
 class Nmapscan:
@@ -29,8 +30,8 @@ class Nmapscan:
         self.save = save
         self.logger = logging.getLogger(__file__)
         self.active_stdout_stderr = (
-                None if active_stdout_stderr[0] else asyncio.subprocess.PIPE, 
-                None if active_stdout_stderr[1] else asyncio.subprocess.PIPE
+                None if active_stdout_stderr[0] else open(os.devnull, 'w'), 
+                None if active_stdout_stderr[1] else open(os.devnull, 'w')
                 )
 
     def __del__(self):
@@ -47,7 +48,7 @@ class Nmapscan:
         thread.start()
         (p_stdout, p_stderr) = self.active_stdout_stderr
         self.proc = await asyncio.create_subprocess_exec(self.nmap_exec, *self.scan_parameters, stdout=p_stdout, stderr=p_stderr)
-        await self.proc.wait()
+        await self.proc.communicate()
         event.set()
         thread.join()
 
@@ -77,20 +78,14 @@ class Nmapscan:
                 self.logger.debug(err, stack_info=True)
             return None
 
-        data = ""
-        record = False
-        tasks = []
-        last_file_position = 0
-        while not event.is_set():
+        async def parseXmlFile(xml_file_path):
+            last_file_position = 0
+            tasks = []
+            data = ""
+            record = False
             try:
-                await asyncio.sleep(1)
-                try:
-                    r = open(self.output_xml_file_path, 'r')
-                except Exception as err:
-                    self.logger.debug(err, stack_info=True)
-                    continue
-                with r as file:
-                    file.seek(last_file_position)
+                async with aiofiles.open(xml_file_path, mode='r') as file:
+                    await file.seek(last_file_position)
                     for line in file:
                         if "<host" in line:
                             record = True
@@ -103,7 +98,7 @@ class Nmapscan:
                             if not result:
                                 continue
                             (adresse, port, adresse_type,
-                             methodes, unix_date) = result
+                                methodes, unix_date) = result
                             output = database_type(
                                 adresse, adresse_type, methodes, unix_date, port)
                             save_function = await self.save.special_save(
@@ -111,9 +106,19 @@ class Nmapscan:
                             save_function += await self.save.general_save(
                                 str(output), self.output_open_proxy_file_path)
                             tasks += [asyncio.create_task(func)
-                                      for func in save_function]
+                                        for func in save_function]
 
-                    last_file_position = file.tell()
+                    last_file_position = await file.tell()
+                    
+            except Exception as err:
+                self.logger.debug(err, stack_info=True)
+            return tasks   
+        
+        tasks = []
+        while not event.is_set():
+            try:
+                await asyncio.sleep(1)
+                tasks += await parseXmlFile(self.output_xml_file_path)
             except Exception as err:
                 self.logger.error(err, stack_info=True)
         try:

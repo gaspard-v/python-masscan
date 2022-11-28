@@ -1,7 +1,7 @@
 from data_saver import GENERAL_CALLBACK, SPECIAL_CALLBACK, database_type
 import mariadb
 import logging
-
+import aiofiles
 
 async def __save_print(data: str, filename: str):
     print(f"{filename}: \"{ascii(data)}\"")
@@ -10,8 +10,8 @@ async def __save_print(data: str, filename: str):
 async def __save_file(data: str, filename: str):
     logger = logging.getLogger()
     try:
-        with open(filename, "a+") as file:
-            file.write(data)
+        async with aiofiles.open(filename, mode="a+") as file:
+            await file.write(data)
     except Exception as err:
         logger.warning(err)
 

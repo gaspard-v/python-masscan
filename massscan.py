@@ -22,8 +22,8 @@ class Masscan:
                                 "-oB", output_bin_file_path, "-p", str(port)]
         self.logger = logging.getLogger(__file__)
         self.active_stdout_stderr = (
-                None if active_stdout_stderr[0] else asyncio.subprocess.PIPE, 
-                None if active_stdout_stderr[1] else asyncio.subprocess.PIPE
+                None if active_stdout_stderr[0] else open(os.devnull, 'w'), 
+                None if active_stdout_stderr[1] else open(os.devnull, 'w')
                 )
 
     def __del__(self):
@@ -36,21 +36,21 @@ class Masscan:
     async def start_scan(self):
         (p_stdout, p_stderr) = self.active_stdout_stderr
         self.proc = await asyncio.create_subprocess_exec(self.masscan_exec, *self.scan_parameters, stdout=p_stdout, stderr=p_stderr)
-        result = await self.proc.wait()
+        result = await self.proc.communicate()
         return result
 
     async def transform_output_file(self):
         (p_stdout, p_stderr) = self.active_stdout_stderr
         self.proc = await asyncio.create_subprocess_exec(self.masscan_exec, "--readscan", self.output_bin_file_path, "-oJ", self.output_json_file_path, stdout=p_stdout, stderr=p_stderr)
         await self.proc.wait()
-        with open(self.output_json_file_path, 'r') as json_file, open(self.output_plain_file_path, 'w+') as plain_file:
+        async with aiofiles.open(self.output_json_file_path, 'r') as json_file, aiofiles.open(self.output_plain_file_path, 'w+') as plain_file:
             for line in json_file:
                 try:
                     data = json.loads(line)
                 except Exception as err:
                     self.logger.debug(err, stack_info=True)
                     continue
-                plain_file.write(f"{data['ip']}\n")
+                await plain_file.write(f"{data['ip']}\n")
 
     async def delete_temporary_files(self):
         try:

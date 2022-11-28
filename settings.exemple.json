@@ -20,6 +20,6 @@
   "open_proxy_file": "./open_proxy_$DATETIME.txt",
   "nmap_additional_args": [],
   "masscan_additional_args": [],
-  "print_stdout": false,
+  "print_stdout": true,
   "print_stderr": true
 }

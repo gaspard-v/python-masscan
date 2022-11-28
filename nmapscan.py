@@ -29,8 +29,8 @@ class Nmapscan:
         self.save = save
         self.logger = logging.getLogger(__file__)
         self.active_stdout_stderr = (
-                asyncio.subprocess.PIPE if active_stdout_stderr[0] else None, 
-                asyncio.subprocess.PIPE if active_stdout_stderr[1] else None
+                None if active_stdout_stderr[0] else asyncio.subprocess.PIPE, 
+                None if active_stdout_stderr[1] else asyncio.subprocess.PIPE
                 )
 
     def __del__(self):

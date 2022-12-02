@@ -75,7 +75,7 @@ async def main():
             masscan_scan_arguments = ["--excludefile",
                                     blacklist_file, "--open-only", "--wait", "10", 
                                     "--exclude", "255.255.255.255", "--capture", "html",
-                                    "--rate", "500000", "0.0.0.0/0"]
+                                    "--rate", "500000", "139.198.180.226/32"]
             masscan_scan_arguments += settings["masscan_additional_args"]
             masscan = Masscan(masscan_executable, scan_file_binary,
                               scan_file_json, scan_file_plain, port, (settings["print_stdout"], settings["print_stderr"]) , masscan_scan_arguments)

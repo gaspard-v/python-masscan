@@ -44,7 +44,7 @@ class Masscan:
         self.proc = await asyncio.create_subprocess_exec(self.masscan_exec, "--readscan", self.output_bin_file_path, "-oJ", self.output_json_file_path, stdout=p_stdout, stderr=p_stderr)
         await self.proc.wait()
         async with aiofiles.open(self.output_json_file_path, 'r') as json_file, aiofiles.open(self.output_plain_file_path, 'w+') as plain_file:
-            for line in json_file:
+            async for line in json_file:
                 try:
                     data = json.loads(line)
                 except Exception as err:

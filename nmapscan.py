@@ -86,7 +86,7 @@ class Nmapscan:
             try:
                 async with aiofiles.open(xml_file_path, mode='r') as file:
                     await file.seek(last_file_position)
-                    for line in file:
+                    async for line in file:
                         if "<host" in line:
                             record = True
                         if record:

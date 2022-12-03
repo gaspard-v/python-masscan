@@ -78,15 +78,14 @@ class Nmapscan:
                 self.logger.debug(err, stack_info=True)
             return None
 
-        async def parseXmlFile(xml_file_path):
-            last_file_position = 0
+        async def parseXmlFile(xml_file_path, last_file_position):
             tasks = []
             data = ""
             record = False
             try:
-                with open(xml_file_path, mode='r') as file:
-                    file.seek(last_file_position)
-                    for line in file:
+                async with aiofiles.open(xml_file_path, mode='r') as file:
+                    await file.seek(last_file_position)
+                    async for line in file:
                         if "<host" in line:
                             record = True
                         if record:
@@ -108,17 +107,19 @@ class Nmapscan:
                             tasks += [asyncio.create_task(func)
                                         for func in save_function]
 
-                    last_file_position = file.tell()
+                    last_file_position = await file.tell()
                     
             except Exception as err:
                 self.logger.debug(err, stack_info=True)
-            return tasks   
+            return (tasks, last_file_position)
         
         tasks = []
+        last_file_position = 0
         while not event.is_set():
             try:
                 await asyncio.sleep(1)
-                tasks += await parseXmlFile(self.output_xml_file_path)
+                (return_tasks, last_file_position) = await parseXmlFile(self.output_xml_file_path, last_file_position)
+                tasks += return_tasks
             except Exception as err:
                 self.logger.error(err, stack_info=True)
         try:

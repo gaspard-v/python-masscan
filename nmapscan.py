@@ -78,10 +78,8 @@ class Nmapscan:
                 self.logger.debug(err, stack_info=True)
             return None
 
-        async def parseXmlFile(xml_file_path, last_file_position):
+        async def parseXmlFile(xml_file_path, last_file_position, record, data):
             tasks = []
-            data = ""
-            record = False
             try:
                 async with aiofiles.open(xml_file_path, mode='r') as file:
                     await file.seek(last_file_position)
@@ -111,14 +109,16 @@ class Nmapscan:
                     
             except Exception as err:
                 self.logger.debug(err, stack_info=True)
-            return (tasks, last_file_position)
+            return (tasks, last_file_position, record, data)
         
         tasks = []
         last_file_position = 0
+        data = ""
+        record = False
         while not event.is_set():
             try:
                 await asyncio.sleep(1)
-                (return_tasks, last_file_position) = await parseXmlFile(self.output_xml_file_path, last_file_position)
+                (return_tasks, last_file_position, record, data) = await parseXmlFile(self.output_xml_file_path, last_file_position, record, data)
                 tasks += return_tasks
             except Exception as err:
                 self.logger.error(err, stack_info=True)

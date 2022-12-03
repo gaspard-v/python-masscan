@@ -3,7 +3,7 @@ import os
 import json
 import logging
 import aiofiles.os
-
+import aiofiles
 
 class Masscan:
     def __init__(self, masscan_exec: str,

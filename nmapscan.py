@@ -84,9 +84,9 @@ class Nmapscan:
             data = ""
             record = False
             try:
-                async with aiofiles.open(xml_file_path, mode='r') as file:
-                    await file.seek(last_file_position)
-                    async for line in file:
+                with open(xml_file_path, mode='r') as file:
+                    file.seek(last_file_position)
+                    for line in file:
                         if "<host" in line:
                             record = True
                         if record:
@@ -108,7 +108,7 @@ class Nmapscan:
                             tasks += [asyncio.create_task(func)
                                         for func in save_function]
 
-                    last_file_position = await file.tell()
+                    last_file_position = file.tell()
                     
             except Exception as err:
                 self.logger.debug(err, stack_info=True)

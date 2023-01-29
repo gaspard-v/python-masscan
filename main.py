@@ -3,7 +3,7 @@
 
 import asyncio
 from nmapscan import Nmapscan
-from massscan import Masscan
+from masscan import Masscan
 import savers
 from data_saver import data_saver
 from utils import logrotate, parse_settings_string

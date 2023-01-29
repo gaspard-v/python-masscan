@@ -37,8 +37,8 @@ async def add_success_callback(fut, callback):
     return result
 
 
-def between_callback(callback, args):
+def between_callback(callback, *args, **kwargs):
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
-    loop.run_until_complete(callback(args))
+    loop.run_until_complete(callback(*args, **kwargs))
     loop.stop()

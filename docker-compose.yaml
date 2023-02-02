@@ -4,6 +4,8 @@ services:
     image: "xosh/python-masscan-openproxy"
     volumes:
       - ./settings.json:/python-masscan/settings.json:ro
+      - ./proxyscan.log:/python-masscan/proxyscan.log:rw
+      - ./open_proxy.txt:/python-masscan/open_proxy.txt:rw
     network_mode: "host"
     restart: on-failure
     container_name: python-masscan-openproxy

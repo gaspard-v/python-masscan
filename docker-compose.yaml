@@ -1,7 +1,7 @@
 version: "3.2"
 services:
   python-masscan:
-    image: "xosh/python-masscan-openproxy:1.0"
+    image: "xosh/python-masscan-openproxy"
     volumes:
       - ./settings.json:/python-masscan/settings.json:ro
     network_mode: "host"

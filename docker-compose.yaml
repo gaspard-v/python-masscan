@@ -6,3 +6,4 @@ services:
       - ./settings.json:/python-masscan/settings.json:ro
     network_mode: "host"
     restart: on-failure
+    container_name: python-masscan-openproxy

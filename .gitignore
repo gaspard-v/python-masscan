@@ -133,3 +133,5 @@ dmypy.json
 settings.json
 
 node_modules/
+
+.env

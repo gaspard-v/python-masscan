@@ -1,6 +1,9 @@
 "use strict";
 import Express from "express";
 import { createPool } from "mariadb";
+import * as dotenv from "dotenv";
+
+dotenv.config();
 
 const app = Express();
 app.use(Express.json());
@@ -18,4 +21,8 @@ app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Headers", "*");
   next();
+});
+
+app.listen(process.env.PORT, async () => {
+  console.log(`proxy logger app is listening on port ${process.env.PORT}`);
 });

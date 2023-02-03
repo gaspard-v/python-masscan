@@ -1,9 +1,9 @@
 const proxy = {
   address: "",
-  port: 3128,
-  ip_type: 4,
+  port: -1,
+  ip_type: -1,
   methodes: "",
-  scan_date: 123456789,
+  scan_date: -1,
   commentaire: "",
 };
 

@@ -27,7 +27,7 @@ CREATE TABLE data (
 
 CREATE TABLE token_state_t (
     id SERIAL,
-    token_state VARCHAR(20) NOT NULL UNIQUE DEFAULT "valid",
+    token_state VARCHAR(20) NOT NULL,
     PRIMARY KEY(id)
 );
 
@@ -35,7 +35,7 @@ INSERT INTO token_state_t (token_state) VALUES "valid, expired", "deleted", "inv
 
 CREATE TABLE permission_t (
     id SERIAL,
-    permission VARCHAR(20) NOT NULL UNIQUE DEFAULT "read",
+    permission VARCHAR(20) NOT NULL,
     PRIMARY KEY(id)
 );
 

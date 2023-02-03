@@ -27,7 +27,7 @@ CREATE TABLE data (
 
 CREATE TABLE token_state_t (
     id SERIAL,
-    token_state VARCHAR(20) NOT NULL,
+    token_state VARCHAR(30) NOT NULL UNIQUE,
     PRIMARY KEY(id)
 );
 
@@ -35,7 +35,7 @@ INSERT INTO token_state_t (token_state) VALUES "valid, expired", "deleted", "inv
 
 CREATE TABLE permission_t (
     id SERIAL,
-    permission VARCHAR(20) NOT NULL,
+    permission VARCHAR(30) NOT NULL UNIQUE,
     PRIMARY KEY(id)
 );
 
@@ -43,7 +43,7 @@ INSERT INTO permission_t (permission) VALUES "proxy_read", "proxy_create", "prox
                                              "token_read", "token_create", "token_update", "token_delete", "token_all",
                                              "all_all";
 
-CREATE TABLE token (
+CREATE TABLE token_t (
     id SERIAL,
     token_state_fk SERIAL NOT NULL,
     token CHAR(10) NOT NULL UNIQUE,
@@ -56,7 +56,7 @@ CREATE TABLE token (
 CREATE TABLE join_token_permission (
     token_fk SERIAL,
     permission_fk SERIAL,
-    FOREIGN KEY (token_fk) REFERENCE token(id) ON UPDATE CASCADE ON DELETE CASCADE,
+    FOREIGN KEY (token_fk) REFERENCE token_t(id) ON UPDATE CASCADE ON DELETE CASCADE,
     FOREIGN KEY (permission_fk) REFERENCE permission_t(id) ON UPDATE CASCADE ON DELETE CASCADE,
     PRIMARY KEY(token_fk, permission_fk)
 );
@@ -73,5 +73,29 @@ END; //
 CREATE PROCEDURE add_data (IN in_data LONGBLOB, IN in_filename TEXT, IN in_commentaire TEXT)
 BEGIN
     INSERT INTO data (data, filename, commentaire) VALUES (in_data, in_filename, in_commentaire);
+END; //
+
+CREATE PROCEDURE add_token (IN in_token CHAR(10), IN in_token_state VARCHAR(30), IN in_date BIGINT UNSIGNED)
+BEGIN
+    DECLARE var_token_state_id BIGINT UNSIGNED;
+    DECLARE var_date DATETIME;
+
+    SET var_date = FROM_UNIXTIME(in_date);
+    SET var_token_state_id = SELECT id FROM token_state_t WHERE token_state = in_token_state;
+
+    INSERT INTO token_t (token, token_state_fk, creation_date, modifiation_date) VALUES (in_token, var_token_state_id, var_date, var_date)
+    ON DUPLICATE KEY UPDATE id=id, token_state_fk=var_token_state_id, modifiation_date=var_date;
+END; //
+
+CREATE PROCEDURE add_token_permission (IN in_token CHAR(10), IN in_permission VARCHAR(30))
+BEGIN
+    DECLARE var_permission_id BIGINT UNSIGNED;
+    DECLARE var_token_id BIGINT UNSIGNED;
+
+    SET var_permission_id = SELECT id FROM permission_t WHERE permission = in_permission;
+    SET var_token_id = SELECT id FROM token_t WHERE token = in_token;
+
+    INSERT INTO join_token_permission(token_fk, permission_fk) VALUES (var_token_id, var_permission_id);
+    UPDATE token_t SET modifiation_date = NOW() WHERE id = var_token_id;
 END; //
 DELIMITER ;

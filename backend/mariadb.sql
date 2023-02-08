@@ -114,5 +114,6 @@ BEGIN
     SELECT permission_t.permission FROM permission_t 
     INNER JOIN join_token_permission ON join_token_permission.permission_fk = permission_t.id 
     INNER JOIN token_t ON join_token_permission.token_fk = token_t.id AND token_t.token = in_token;
+
 END; //
 DELIMITER ;

@@ -8,17 +8,14 @@ export async function create_proxy({
   scan_date,
   commentaire,
 }) {
-  return database
-    .getConnection()
-    .then((conn) =>
-      conn.query("CALL add_proxy(?,?,?,?,?,?)", [
-        address,
-        port,
-        ip_type,
-        methodes,
-        scan_date,
-        commentaire,
-      ])
-    )
-    .then((result) => result);
+  const conn = await database.getConnection();
+  const result = await conn.query("CALL add_proxy(?,?,?,?,?,?)", [
+    address,
+    port,
+    ip_type,
+    methodes,
+    scan_date,
+    commentaire,
+  ]);
+  return result;
 }

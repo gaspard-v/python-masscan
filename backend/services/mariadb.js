@@ -1,5 +1,7 @@
 import { createPool } from "mariadb";
+import * as dotenv from "dotenv";
 
+dotenv.config();
 const database = createPool({
   host: process.env.DB_HOST,
   user: process.env.DB_USER,

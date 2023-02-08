@@ -1,6 +1,7 @@
 "use strict";
 import Express from "express";
 import proxy from "./routes/proxy.js";
+import token from "./routes/token.js";
 import * as dotenv from "dotenv";
 
 dotenv.config();
@@ -20,6 +21,7 @@ app.use((err, req, res, next) => {
 });
 
 app.use("/proxy", proxy);
+app.use("/token", token);
 
 app.listen(process.env.PORT, async () => {
   console.log(`proxy logger app is listening on port ${process.env.PORT}`);

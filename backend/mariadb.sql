@@ -108,4 +108,11 @@ BEGIN
     SELECT id INTO var_token_id FROM token_t WHERE token = in_token;
     DELETE FROM join_token_permission WHERE token_fk=var_token_id AND permission_fk=var_permission_id;
 END; //
+
+CREATE PROCEDURE get_token_permission (IN in_token CHAR(10))
+BEGIN
+    SELECT permission_t.permission FROM permission_t 
+    INNER JOIN join_token_permission ON join_token_permission.permission_fk = permission_t.id 
+    INNER JOIN token_t ON join_token_permission.token_fk = token_t.id AND token_t.token = in_token;
+END; //
 DELIMITER ;

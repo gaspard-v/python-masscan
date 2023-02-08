@@ -1,6 +1,6 @@
 import Express from "express";
 
-import { check_permission } from "../controllers/token.js";
+import { get_permission } from "../controllers/token.js";
 
 const router = Express.Router();
 
@@ -9,7 +9,7 @@ router.route("/").get(async (req, res) => {
 });
 
 router.route("/:token").get(async (req, res) => {
-  res.send(check_permission(req.params.token));
+  res.send(await get_permission(req.params.token));
 });
 
 export default router;

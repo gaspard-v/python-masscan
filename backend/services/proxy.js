@@ -7,7 +7,6 @@ export async function create_proxy({
   methodes,
   scan_date,
   commentaire,
-  token,
 }) {
   return database
     .getConnection()

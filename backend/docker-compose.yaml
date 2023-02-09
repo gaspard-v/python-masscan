@@ -1,0 +1,23 @@
+version: "3.2"
+services:
+  mariadb:
+    image: mariadb
+    container_name: python-masscan-database
+    restart: on-failure
+    volumes:
+      - ./mariadb.sql:/docker-entrypoint-initdb.d/01_mariadb.sql:ro
+    environment:
+      - MYSQL_ROOT_HOST="%"
+    networks:
+      - backend
+  python-masscan:
+    image: "xosh/python-masscan-backend"
+    restart: on-failure
+    container_name: python-masscan-backend
+    networks:
+      - backend
+    links:
+      - mariadb
+
+networks:
+  backend:

@@ -10,14 +10,14 @@ export async function get_permission({ token }) {
 
 export async function check_permission({ token, permission }) {
   const result = await get_permission({ token: token });
-  if (!result.length) return false;
-  if (result.includes(permission)) return true;
-  if (result.includes("all_all")) return true;
+  if (!result.length) return [false, "token doest not exist"];
+  if (result.includes(permission)) return [true, ""];
+  if (result.includes("all_all")) return [true, ""];
   if (permission.startsWith("proxy_")) {
     return result.includes("proxy_all");
   }
   if (permission.startsWith("token_")) {
     return result.includes("token_all");
   }
-  return false;
+  return [false, "not permitted"];
 }

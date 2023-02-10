@@ -9,7 +9,9 @@ router.route("/").get(async (req, res) => {
 });
 
 router.route("/create").get(async (req, res) => {
-  res.send(create_proxy(req.body));
+  const result = create_proxy(req.body);
+  if (!result) res.send(403);
+  res.send(result);
 });
 
 export default router;

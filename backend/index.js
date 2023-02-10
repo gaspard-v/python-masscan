@@ -2,6 +2,7 @@
 import Express from "express";
 import proxy from "./routes/proxy.js";
 import token from "./routes/token.js";
+import { check_permission } from "./controllers/permission.js";
 import * as dotenv from "dotenv";
 
 dotenv.config();
@@ -19,6 +20,8 @@ app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).send("Error");
 });
+
+app.use("/token", check_permission);
 
 app.use("/proxy", proxy);
 app.use("/token", token);

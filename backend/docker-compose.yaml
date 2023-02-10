@@ -5,15 +5,22 @@ services:
     container_name: python-masscan-database
     restart: on-failure
     volumes:
+      - mariadb-volume:/var/lib/mysql:rw
       - ./mariadb.sql:/docker-entrypoint-initdb.d/01_mariadb.sql:ro
     environment:
-      - MYSQL_ROOT_HOST="%"
+      - MYSQL_HOST="%"
+      - MYSQL_USER=${DB_USER}
+      - MYSQL_PASSWORD=${DB_PASSWORD}
+      - MARIADB_DATABASE=${DB_DATABASE}
+      - MARIADB_RANDOM_ROOT_PASSWORD=true
     networks:
       - backend
   python-masscan:
     image: "xosh/python-masscan-backend"
     restart: on-failure
     container_name: python-masscan-backend
+    ports:
+      - "8888:8888"
     networks:
       - backend
     links:
@@ -21,3 +28,6 @@ services:
 
 networks:
   backend:
+
+volumes:
+  mariadb-volume:

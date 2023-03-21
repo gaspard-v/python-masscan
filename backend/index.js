@@ -6,6 +6,10 @@ import { check_permission } from "./controllers/permission.js";
 import * as dotenv from "dotenv";
 import httpStatus from "http-status";
 
+BigInt.prototype.toJSON = function () {
+  return this.toString();
+};
+
 dotenv.config();
 
 const app = Express();

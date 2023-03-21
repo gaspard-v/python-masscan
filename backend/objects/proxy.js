@@ -1,4 +1,4 @@
-const proxy = {
+export const proxy_t = {
   absolute: true,
   objects: {
     address: {
@@ -28,15 +28,21 @@ const proxy = {
     },
     scan_date: {
       type: "integer",
+    },
+    commentaire: {
+      type: "string",
       options: {
         optional: true,
       },
     },
-    commentaire: {
-      type: "string",
-      optional: true,
-    },
   },
 };
 
-export default proxy;
+export const default_proxy = {
+  address: "",
+  port: 0,
+  ip_type: 4,
+  methodes: "",
+  scan_date: 0,
+  commentaire: null,
+};

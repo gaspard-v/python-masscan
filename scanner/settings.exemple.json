@@ -14,6 +14,8 @@
   "mariadb_kwargs": {
     "autocommit": true
   },
+  "api_url": "https://exemple.com",
+  "api_token": "a_token",
   "nmap_executable": "nmap",
   "nmap_plain_file": "./nmap_scan_$DATETIME.txt",
   "nmap_xml_file": "./nmap_scan_$DATETIME.xml",

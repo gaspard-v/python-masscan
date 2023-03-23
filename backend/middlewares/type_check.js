@@ -27,9 +27,7 @@ export async function validateObject(req, res, next) {
         (prop) => !schemaProperties.includes(prop)
       );
       if (extraProperties.length > 0) {
-        throw extraProperties.map(
-          (property) => new ExtraPropertyError(property)
-        );
+        throw new ExtraPropertyError(extraProperties.join(", "));
       }
     }
 

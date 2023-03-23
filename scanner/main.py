@@ -58,11 +58,9 @@ async def main():
                            "--open", "-Pn", "-sS"]
     nmap_scan_arguments += settings["nmap_additional_args"]
     
-    mariadb_kwargs = settings['mariadb_kwargs']
-    db = savers.save_mariadb(settings['mariadb_user'], settings['mariadb_password'],
-                             settings['mariadb_host'], settings['mariadb_database'], **mariadb_kwargs)
+    api = savers.save_api(settings['api_url'], settings['api_token'])
     savers_obj = data_saver(
-        [savers.save_file], [db.save_mariadb])
+        [savers.save_file], [api.save_api])
 
     tasks = []
 

@@ -11,6 +11,8 @@ export async function check_permission(req, res, next) {
     if (!token_header) throw new HeaderRequiredError("authorization");
     const [token_type, token] = token_header.split(" ");
     if (!token || !token_type) throw new HeaderMalformedError("authorization");
+    if (token_type.toLowerCase() !== "bearer")
+      throw new HeaderMalformedError("authorization");
     const obj = req.baseUrl.substring(1);
     const method = req.path.substring(1);
     if (!obj || !method) {
@@ -22,7 +24,8 @@ export async function check_permission(req, res, next) {
       token: token,
       permission: permission,
     });
-    if (!result_token) throw new TokenPermissionError(token, permission);
+    const [permitted] = result_token;
+    if (!permitted) throw new TokenPermissionError(token, permission);
   } catch (err) {
     next(err);
   }

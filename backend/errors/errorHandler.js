@@ -73,8 +73,8 @@ async function errorHandler(err, req, res, next) {
     });
   }
   if (err instanceof TokenPermissionError) {
-    return res.status(400).json({
-      status: httpStatus["400_NAME"],
+    return res.status(401).json({
+      status: httpStatus["401_NAME"],
       message: err.message,
       details: {
         token: err.token,
@@ -82,6 +82,7 @@ async function errorHandler(err, req, res, next) {
       },
     });
   }
+  console.error(err);
   return res.status(500).json({
     status: httpStatus["500_NAME"],
     message: "An unknow error has occured",

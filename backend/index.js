@@ -4,7 +4,7 @@ import proxy from "./routes/proxy.js";
 import token from "./routes/token.js";
 import { check_permission } from "./controllers/permission.js";
 import * as dotenv from "dotenv";
-import httpStatus from "http-status";
+import errorHandler from "./errors/errorHandler.js";
 
 BigInt.prototype.toJSON = function () {
   return this.toString();
@@ -21,17 +21,10 @@ app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Headers", "*");
   next();
 });
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({
-    status: httpStatus["500_NAME"],
-    message: "An unknow error has occured",
-    details: err,
-  });
-});
 
 app.use("/proxy", check_permission, proxy);
 app.use("/token", check_permission, token);
+app.use(errorHandler);
 
 const listen_port = process.env.PORT || 8888;
 const listen_host = process.env.LISTEN_HOST || "localhost";

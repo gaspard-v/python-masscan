@@ -4,8 +4,8 @@ import PropertyEnumError from "../errors/PropertyEnumError.js";
 import PropertyRequiredError from "../errors/PropertyRequiredError.js";
 import PropertyTypeError from "../errors/PropertyTypeError.js";
 import HeaderError from "./HeaderError.js";
-import HeaderMalformedError from "./HeaderMalformedError.js";
-import HeaderRequiredError from "./HeaderRequiredError.js";
+import TokenPermissionError from "./TokenPermissionError.js";
+import UrlError from "./UrlError.js";
 import ValidationError from "./ValidationError.js";
 
 async function errorHandler(err, req, res, next) {
@@ -60,6 +60,25 @@ async function errorHandler(err, req, res, next) {
       message: err.message,
       details: {
         header: err.message,
+      },
+    });
+  }
+  if (err instanceof UrlError) {
+    return res.status(400).json({
+      status: httpStatus["400_NAME"],
+      message: err.message,
+      details: {
+        url: err.url,
+      },
+    });
+  }
+  if (err instanceof TokenPermissionError) {
+    return res.status(400).json({
+      status: httpStatus["400_NAME"],
+      message: err.message,
+      details: {
+        token: err.token,
+        permission: err.permission,
       },
     });
   }

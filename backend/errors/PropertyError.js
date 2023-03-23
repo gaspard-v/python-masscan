@@ -1,4 +1,4 @@
-import ValidationError from "./ValidationError";
+import ValidationError from "./ValidationError.js";
 
 class PropertyError extends ValidationError {
   constructor(message, property) {

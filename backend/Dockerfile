@@ -3,6 +3,6 @@ WORKDIR /backend
 COPY package.json package.json
 COPY package-lock.json package-lock.json
 RUN npm i
-EXPOSE 8888
+EXPOSE 8080
 COPY . .
 CMD ["npm", "run", "run"]

@@ -1,3 +1,8 @@
+import PropertyRequiredError from "../errors/PropertyRequiredError.js";
+import ExtraPropertyError from "../errors/ExtraPropertyError.js";
+import PropertyTypeError from "../errors/PropertyTypeError.js";
+import PropertyEnumError from "../errors/PropertyEnumError.js";
+
 export async function validateObject(schema, object) {
   if (typeof object !== "object" || Array.isArray(object))
     throw new TypeError("Not an object");
@@ -9,9 +14,7 @@ export async function validateObject(schema, object) {
       (prop) => !schemaProperties.includes(prop)
     );
     if (extraProperties.length > 0) {
-      throw new TypeError(
-        `Object contains extra properties: ${extraProperties.join(", ")}`
-      );
+      throw extraProperties.map((property) => new ExtraPropertyError(property));
     }
   }
 
@@ -23,34 +26,30 @@ export async function validateObject(schema, object) {
         propertyValue === undefined &&
         !(propertySchema.options && propertySchema.options.optional)
       ) {
-        throw new TypeError(`Missing required property: ${propertyName}`);
+        throw new PropertyRequiredError(propertyName, propertySchema.type);
       } else if (
         propertySchema.type === "string" &&
         typeof propertyValue !== "string"
       ) {
-        throw new TypeError(`Property ${propertyName} should be a string`);
+        throw new PropertyTypeError(propertyName, "string");
       } else if (
         propertySchema.type === "integer" &&
         !Number.isInteger(propertyValue)
       ) {
-        throw new TypeError(`Property ${propertyName} should be an integer`);
+        throw new PropertyTypeError(propertyName, "integer");
       } else if (
         propertySchema.type === "number" &&
         typeof propertyValue !== "number"
       ) {
-        throw new TypeError(`Property ${propertyName} should be an number`);
+        throw new PropertyTypeError(propertyName, "number");
       } else if (propertySchema.type === "enum") {
         const allowedValues = propertySchema.values.map((v) => v.value);
         if (!allowedValues.includes(propertyValue)) {
-          throw new TypeError(
-            `Property ${propertyName} should be one of: ${allowedValues.join(
-              ", "
-            )}`
-          );
+          throw new PropertyEnumError(propertyName, allowedValues);
         }
       }
     } else if (!(propertySchema.options && propertySchema.options.optional)) {
-      throw new TypeError(`Missing required property: ${propertyName}`);
+      throw new PropertyRequiredError(propertyName, propertySchema.type);
     }
   }
 }

@@ -6,9 +6,6 @@ export const proxy_t = {
     },
     port: {
       type: "integer",
-      options: {
-        optional: true,
-      },
     },
     ip_type: {
       type: "enum",

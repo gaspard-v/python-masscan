@@ -20,7 +20,7 @@ services:
     restart: on-failure
     container_name: python-masscan-backend
     ports:
-      - "8888:8888"
+      - "8080:8080"
     networks:
       - backend
     links:

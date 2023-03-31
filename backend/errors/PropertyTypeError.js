@@ -1,4 +1,4 @@
-import PropertyError from "./propertyError.js";
+import PropertyError from "./PropertyError.js";
 
 class PropertyTypeError extends PropertyError {
   constructor(property, expectedType) {

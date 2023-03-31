@@ -5,4 +5,4 @@ COPY package-lock.json package-lock.json
 RUN npm i
 EXPOSE 8080
 COPY . .
-CMD ["npm", "run", "run"]
+CMD ["npm", "run", "start"]

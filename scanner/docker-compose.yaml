@@ -1,7 +1,8 @@
 version: "3.2"
 services:
   python-masscan:
-    image: "xosh/python-masscan-openproxy"
+    image: "python-masscan-openproxy"
+    build: .
     volumes:
       - ./settings.json:/python-masscan/settings.json:ro
       - ./proxyscan.log:/python-masscan/proxyscan.log:rw

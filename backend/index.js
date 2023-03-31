@@ -28,7 +28,7 @@ app.use("/proxy", validateObject, check_permission, proxy);
 app.use("/token", validateObject, check_permission, token);
 app.use(errorHandler);
 
-const listen_port = process.env.PORT || 8888;
+const listen_port = process.env.PORT || 8080;
 const listen_host = process.env.LISTEN_HOST || "localhost";
 app.listen(listen_port, listen_host, async () => {
   console.log(

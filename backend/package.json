@@ -3,7 +3,7 @@
   "type": "module",
   "scripts": {
     "dev": "nodemon  index.js",
-    "run": "node index.js"
+    "start": "node index.js"
   },
   "dependencies": {
     "dotenv": "^16.0.3",

@@ -16,7 +16,8 @@ services:
     networks:
       - backend
   python-masscan:
-    image: "xosh/python-masscan-backend"
+    build: .
+    image: "python-masscan-backend"
     restart: on-failure
     container_name: python-masscan-backend
     ports:

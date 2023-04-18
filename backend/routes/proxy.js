@@ -1,6 +1,5 @@
 import Express from "express";
 import { create_proxy, get_proxies } from "../controllers/proxy.js";
-import FeatureNotImplementedError from "../errors/FeatureNotImplementedError.js";
 
 const router = Express.Router();
 
@@ -19,19 +18,14 @@ router.route("/create").post(async (req, res, next) => {
 });
 router.route("/read").get(async (req, res, next) => {
   try {
-    if (req.query.inline) {
-      const number = req.query.number;
-      const result = await get_proxies_lines({ number: number });
-      if (!result) {
-        res.status(404).send();
-        return;
-      }
-      res.status(200).send(result);
-      return;
-    }
-    throw new FeatureNotImplementedError(
-      "JSON read proxies is not yet implemented"
-    );
+    const number = req.query.number;
+    const inline = req.query.inline;
+    const result = await get_proxies({
+      number: number,
+      inline: inline,
+    });
+    if (inline) return res.status(200).send(result);
+    res.status(200).json(result);
   } catch (err) {
     next(err);
   }

@@ -9,6 +9,7 @@ router.route("/").get(async (req, res) => {
 });
 
 router.route("/:token").get(async (req, res) => {
+  // TODO changer pour être conforme avec l'objet permission
   res.send(await get_permission(req.params.token));
 });
 

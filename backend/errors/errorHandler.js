@@ -7,6 +7,8 @@ import HeaderError from "./HeaderError.js";
 import TokenPermissionError from "./TokenPermissionError.js";
 import UrlError from "./UrlError.js";
 import ValidationError from "./ValidationError.js";
+import NoTokenError from "./NoTokenError.js";
+import FeatureNotImplementedError from "./FeatureNotImplementedError.js";
 
 async function errorHandler(err, req, res, next) {
   if (err instanceof PropertyRequiredError) {
@@ -80,6 +82,18 @@ async function errorHandler(err, req, res, next) {
         token: err.token,
         permission: err.permission,
       },
+    });
+  }
+  if (err instanceof NoTokenError) {
+    return res.status(401).json({
+      status: httpStatus["401_NAME"],
+      message: err.message,
+    });
+  }
+  if (err instanceof FeatureNotImplementedError) {
+    return res.status(500).json({
+      status: httpStatus["500_NAME"],
+      message: err.message,
     });
   }
   console.error(err);

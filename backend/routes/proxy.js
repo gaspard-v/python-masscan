@@ -1,5 +1,5 @@
 import Express from "express";
-import { create_proxy } from "../controllers/proxy.js";
+import { create_proxy, get_proxies } from "../controllers/proxy.js";
 
 const router = Express.Router();
 
@@ -16,5 +16,17 @@ router.route("/create").post(async (req, res, next) => {
     next(err);
   }
 });
-
+router.route("/get").get(async (req, res, next) => {
+  try {
+    const number = req.query.number;
+    const result = await get_proxies({ number: number });
+    if (!result) {
+      res.status(404).send();
+      return;
+    }
+    res.status(200).send(result);
+  } catch (err) {
+    next(err);
+  }
+});
 export default router;

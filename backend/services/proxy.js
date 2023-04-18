@@ -19,3 +19,10 @@ export async function create_proxy({
   ]);
   return result;
 }
+
+export async function get_proxies({ number }) {
+  const conn = await database.getConnection();
+  let query = "SELECT address, port FROM proxy ORDER BY update_date DESC";
+  if (number) query += ` LIMIT ${number}`;
+  return await conn.query(query);
+}

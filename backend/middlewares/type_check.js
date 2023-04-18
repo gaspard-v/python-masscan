@@ -9,6 +9,7 @@ const baseToObject = {
 };
 
 export async function validateObject(req, res, next) {
+  if (req.method == "GET" || req.method == "HEAD") return next();
   try {
     const base = req.baseUrl.substring(1);
     const schema = baseToObject[base];

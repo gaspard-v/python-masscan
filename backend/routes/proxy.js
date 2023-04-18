@@ -16,10 +16,10 @@ router.route("/create").post(async (req, res, next) => {
     next(err);
   }
 });
-router.route("/get").get(async (req, res, next) => {
+router.route("/get-lines").get(async (req, res, next) => {
   try {
     const number = req.query.number;
-    const result = await get_proxies({ number: number });
+    const result = await get_proxies_lines({ number: number });
     if (!result) {
       res.status(404).send();
       return;

@@ -6,7 +6,7 @@ export async function create_proxy({ body }) {
   return await cp(constructed_proxy);
 }
 
-export async function get_proxies({ number }) {
+export async function get_proxies_lines({ number }) {
   const result = await gp({ number: number });
   let result_string = "";
   result.forEach(({ address, port }) => {

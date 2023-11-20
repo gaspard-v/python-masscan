@@ -9,12 +9,12 @@
   "type": "http",
   "mariadb_user": "openproxy",
   "mariadb_password": "password",
-  "mariadb_host": "exemple.com",
+  "mariadb_host": "example.com",
   "mariadb_database": "openproxy",
   "mariadb_kwargs": {
     "autocommit": true
   },
-  "api_url": "https://exemple.com",
+  "api_url": "https://example.com",
   "api_token": "a_token",
   "nmap_executable": "nmap",
   "nmap_plain_file": "./nmap_scan_$DATETIME.txt",

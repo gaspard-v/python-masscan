@@ -16,6 +16,35 @@ A NodeJS backend to store data sent by python scanners.
 
 1. Run `docker compose up -d`
 
+## Token
+
+The backend works with token and permissions.
+Each token has it ows permissions.
+
+### permissions
+
+permissions are
+
+- `proxy_read` : Allows access to proxies informations
+- `proxy_write` : Allows the creation of new proxies informations
+- `proxy_update` : Allows changes of already created proxies informations
+- `proxy_delete` : Allows supression of proxies informations
+- `proxy_all` : Gives all proxies informations permissions
+- `token_read` : Allows access to tokens permissions
+- `token_create` : Allows the creation of new tokens
+- `token_update` : Allows changes of already created token
+- `token_delete` : Allow supression of already created tokens
+- `proxy_all` : Give all tokens permissions
+- `all_all` : Give all permissions
+
+### token
+
+Token are 10 random characters.
+
+### Create a token
+
+to create a token, use the `add_token` and `add_token_permission` mariadb procedures
+
 ## Env file
 
 ```bash

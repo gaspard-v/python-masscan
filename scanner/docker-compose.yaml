@@ -1,4 +1,4 @@
-version: "3.2"
+version: "3"
 services:
   python-masscan:
     image: xosh/python-masscanner
@@ -9,4 +9,3 @@ services:
       - ./open_proxy.txt:/python-masscan/open_proxy.txt:rw
     network_mode: host
     restart: on-failure
-    container_name: python-masscan-openproxy
